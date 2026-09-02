@@ -1,0 +1,186 @@
+---
+/**
+ * Promise — "The promise" section.
+ *
+ * Recreates design/README.md §3 (The promise) and the approved reference in
+ * design/design-reference/Basset Landing.dc.html exactly: a left-aligned
+ * section with the mono kicker "THE PROMISE", the H2 promise statement, a
+ * responsive grid of three outcome cards (01/02/03), and a closing emphasis
+ * paragraph. The section is separated from the hero above it by a 1px
+ * hairline top border — the global rule the brief specifies for section
+ * separation.
+ *
+ * Card 02 embeds design/assets/candidates-view.png (3176x2100) through
+ * Astro's <Image> so the build emits multiple widths and a modern format
+ * via a <picture> with srcset — the screenshot is large and the brief
+ * calls all screenshots out for responsive delivery.
+ *
+ * Card 03 ships text-only for now: the visibility-gap screenshot the brief
+ * notes as "does not exist yet" is tracked as follow-up bead
+ * basset_landing-dox.11 and will land there when the client provides it.
+ *
+ * Every color, size, spacing, radius, and copy string here is bound by the
+ * brief; values live in src/styles/tokens.css and are read through the
+ * token custom properties so a single change ripples across the site. QA
+ * verifies against design/README.md §3 at 1440x900, 900x wide, and 390x844.
+ */
+
+import { Image } from "astro:assets";
+import candidatesView from "../../design/assets/candidates-view.png";
+---
+
+<section class="promise" aria-labelledby="promise-heading">
+  <span class="kicker">The promise</span>
+  <h2 id="promise-heading" class="promise-heading">
+    With the logs you already have, you always end up with an evidence-backed next step.
+  </h2>
+
+  <div class="cards">
+    <article class="card">
+      <span class="num">01</span>
+      <p class="title">The exact line of code, backed by evidence.</p>
+      <p class="body">A causal chain, as in the view above.</p>
+    </article>
+
+    <article class="card">
+      <span class="num">02</span>
+      <p class="title">A set of candidates with confidence levels and evidence.</p>
+      <div class="figure">
+        <Image
+          src={candidatesView}
+          alt="Candidate list with confidence levels"
+          widths={[280, 560, 840, 1120]}
+          sizes="(max-width: 640px) 100vw, (max-width: 960px) 46vw, 30vw"
+          class="figure-image"
+        />
+      </div>
+    </article>
+
+    <article class="card">
+      <span class="num">03</span>
+      <p class="title">
+        A highlighted area where visibility fades and further instrumentation is required.
+      </p>
+    </article>
+  </div>
+
+  <p class="emphasis">
+    This is slow, painstaking work only your experts could do manually. Now anyone on your team can move from a bug ticket to the next step.
+  </p>
+</section>
+
+<style>
+  /* Section container — the brief's global separation rule: a 1px hairline
+     top border between sections, with fluid vertical padding. Left-aligned
+     block, matching the hero and every other section. */
+  .promise {
+    border-top: 1px solid var(--color-hairline);
+    padding: var(--section-padding-y) 0;
+    text-align: left;
+  }
+
+  /* Kicker — mono, uppercase, spaced accent. text-transform lets the source
+     stay in sentence case (matching the design reference's markup) while
+     rendering in caps. */
+  .kicker {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-kicker);
+    letter-spacing: var(--letter-spacing-kicker);
+    text-transform: uppercase;
+    color: var(--color-accent-text);
+  }
+
+  /* Section H2 — the global h2 rule in BaseLayout already applies the type
+     tokens (family/size/weight/line-height/letter-spacing); we add the
+     32ch measure the brief specifies, the vertical rhythm below the kicker,
+     and pin ink color defensively so a global tweak cannot mute it. */
+  .promise-heading {
+    margin: 16px 0 0;
+    max-width: 32ch;
+    color: var(--color-ink);
+  }
+
+  /* Card grid — auto-fit + minmax(280px, 1fr) collapses 3 -> 2 -> 1 columns
+     as the viewport narrows. align-items: start keeps cards top-aligned when
+     card 02's figure makes it taller than 01/03. */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    align-items: start;
+    margin-top: clamp(24px, 3vw, 40px);
+  }
+
+  /* Card — white surface, hairline border, 12px radius, 24px padding. */
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    padding: 24px;
+  }
+
+  /* Card kicker — mono 13px 600 accent, matching the reference's card
+     numbering (01/02/03). 13px is a card-scale mono size the brief uses
+     inside cards (R1/R2/R3 and the "not a ..." tags share it); it is not
+     the section kicker size, so it is set directly here. */
+  .num {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: var(--weight-semibold);
+    color: var(--color-accent-text);
+  }
+
+  /* Card title — 17px/25px/600 ink, sitting 12px below the number. */
+  .title {
+    margin: 12px 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-card-title);
+    line-height: var(--line-height-card-title);
+    font-weight: var(--weight-semibold);
+    color: var(--color-ink);
+  }
+
+  /* Card body — 14.5px/23px muted, 8px below the title. */
+  .body {
+    margin: 8px 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-card-body);
+    line-height: var(--line-height-card-body);
+    color: var(--color-muted);
+  }
+
+  /* Card figure (card 02 only) — 8px-radius bordered frame around the
+     candidates-view screenshot. aspect-ratio 16/10 with overflow: hidden
+     lets object-fit: cover on the image crop the 3176x2100 source to the
+     card's aspect without stretching. */
+  .figure {
+    margin-top: 16px;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-screenshot);
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+  }
+
+  /* Figure image — fills the frame, cropped by aspect. Height is 100% so
+     the aspect-ratio parent controls the box; object-fit: cover preserves
+     the source's own aspect while filling. */
+  .figure-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Closing emphasis paragraph — 18px/29px/600 ink. 60ch measure keeps the
+     line count balanced under the grid. */
+  .emphasis {
+    margin: clamp(32px, 4vw, 48px) 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-emphasis);
+    line-height: var(--line-height-emphasis);
+    font-weight: var(--weight-semibold);
+    color: var(--color-ink);
+    max-width: 60ch;
+  }
+</style>
