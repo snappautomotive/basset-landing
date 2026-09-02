@@ -148,15 +148,20 @@ import walkControl from "../../design/assets/walk-control.png";
     color: var(--color-muted);
   }
 
-  /* Two-up row — auto-fit + minmax(320px, 1fr) collapses two columns to
-     one below ~640px per the brief. align-items: center vertically
-     centers the walk-control screenshot with the short muted paragraph
-     at the wider breakpoint; source order (figure first, paragraph
-     second) means the image stacks above the text when the row
-     collapses to one column. */
+  /* Two-up row — auto-fit + minmax(min(320px, 100%), 1fr) collapses two
+     columns to one below ~640px per the brief. The min(320px, 100%)
+     idiom lets each track shrink below 320px when the container is
+     narrower than that (e.g. a 320px viewport whose content column is
+     only 280px after --content-padding-x), which prevents horizontal
+     overflow at the narrow end of the range. At every wider width the
+     behaviour is unchanged — minmax resolves to minmax(320px, 1fr).
+     align-items: center vertically centers the walk-control screenshot
+     with the short muted paragraph at the wider breakpoint; source
+     order (figure first, paragraph second) means the image stacks
+     above the text when the row collapses to one column. */
   .walk-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
     gap: clamp(24px, 4vw, 48px);
     align-items: center;
     margin-top: clamp(48px, 6vw, 72px);
