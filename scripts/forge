@@ -243,13 +243,13 @@ case "$cmd" in
     [ $# -eq 0 ] || die "usage: forge seed-labels [--dry-run]"
 
     # STATUS labels (lifecycle) and REQUIREMENT labels (plan-time fixed) plus PR SIGNALS.
-    # Format per line: name|color(hex, no '#')|description.
-    desired='in-qa-review|fbca04|STATUS (bead only, by choice): bead is in adversarial QA against its acceptance criteria; QA status is not surfaced on the PR
-in-human-review|1d76db|STATUS (bead + PR): a human must review the PR and report back; present only while awaiting a human, mirrored on both
-allows-auto-merge|c2e0c6|REQUIREMENT (bead): permits this bead PR to auto-merge; absence means human review. QA translates it into the PR auto-merge trigger
-auto-merge|0e8a16|PR TRIGGER: the auto-merge workflow merges this PR once checks pass; set by QA from the bead allows-auto-merge, mutually exclusive with in-human-review
-requires-adr|5319e7|REQUIREMENT (bead): bead needs an ADR to be mergeable; overrides allows-auto-merge (never auto-merges)
-contains-adr|b60205|PR SIGNAL: an ADR is included in this PR; never auto-merges (set by QA when the bead has requires-adr)'
+    # Format per line: name|color(hex, no '#')|description. GitHub caps description at 100 chars.
+    desired='in-qa-review|fbca04|STATUS (bead): work is in adversarial QA against acceptance criteria
+in-human-review|1d76db|STATUS (bead+PR): a human must review; present only while awaiting
+allows-auto-merge|c2e0c6|REQUIREMENT (bead): permits this PR to auto-merge; absence = human review
+auto-merge|0e8a16|PR TRIGGER: workflow merges when checks pass; set by QA from allows-auto-merge
+requires-adr|5319e7|REQUIREMENT (bead): needs an ADR; overrides allows-auto-merge (never auto-merges)
+contains-adr|b60205|PR SIGNAL: an ADR is included; never auto-merges (set by QA from requires-adr)'
 
     existing=""
     if [ -z "$DRY_RUN" ]; then
