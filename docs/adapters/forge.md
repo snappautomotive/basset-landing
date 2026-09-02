@@ -26,6 +26,13 @@ Set in the gitignored `.secrets/forge.env` (see
   `${{ secrets.GITHUB_TOKEN }}` (see `.github/workflows/auto-merge.yml`). Never commit
   or print it.
 
+`scripts/forge` resolves `.secrets/forge.env` from the **main clone's working tree**
+regardless of the invoking cwd — it locates the common `.git` directory with
+`git rev-parse --path-format=absolute --git-common-dir` and reads `.secrets/` from its
+parent. Agents can therefore call `scripts/forge <verb>` directly from any linked
+worktree (e.g. `.claude/worktrees/<id>`); no symlink or per-worktree copy of `.secrets/`
+is needed.
+
 Local prerequisites:
 
 - `gh` installed and authenticated (`gh auth login`).

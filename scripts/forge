@@ -56,7 +56,16 @@ case "${1:-}" in ""|-h|--help|help) help_only=1 ;; esac
 
 if [ -z "$help_only" ]; then
   command -v gh >/dev/null || die "gh (GitHub CLI) not found; install from https://cli.github.com/"
-  root=$(git rev-parse --show-toplevel 2>/dev/null) || die "not in a git repository"
+  # Resolve the MAIN clone's working tree, not the current worktree: .secrets/ is gitignored
+  # and lives only in the main clone. `--git-common-dir` returns the main clone's .git in both
+  # the main clone and any linked worktree under `.claude/worktrees/<id>`, so its parent is the
+  # main clone's working tree. Fall back to `--show-toplevel` if the common-dir lookup fails
+  # (older git, bare repo, etc.), matching the previous behaviour.
+  if common_gitdir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null); then
+    root="$(dirname "$common_gitdir")"
+  else
+    root=$(git rev-parse --show-toplevel 2>/dev/null) || die "not in a git repository"
+  fi
   secret="$root/.secrets/forge.env"
   if [ -f "$secret" ]; then
     _repo="${FORGE_REPO:-}"; _token="${FORGE_TOKEN:-}"
