@@ -1,0 +1,231 @@
+---
+/**
+ * Hero — the site hero.
+ *
+ * Recreates design/README.md §2 (Hero) and the approved reference in
+ * design/design-reference/Basset Landing.dc.html exactly: a left-aligned
+ * block (never centered) with a mono kicker, the H1 promise, the muted
+ * subhead, the primary "Talk to us" mailto button, and a bordered hero
+ * figure whose bottom-right zoom card overlaps into the trailing spacer
+ * before the caption.
+ *
+ * Both product screenshots are served through Astro's <Image> component
+ * so the build emits multiple widths and a modern format via a <picture>
+ * with srcset — the screenshots are large (3176x2100 for the hero) and
+ * the brief calls them out for responsive delivery. Local imports from
+ * design/assets/ are the source; the file paths in dist/ are hashed and
+ * fingerprinted by Astro.
+ *
+ * Every color, size, spacing, radius, shadow, and copy string here is
+ * bound by the brief; values live in src/styles/tokens.css and are read
+ * through the token custom properties so a single change ripples across
+ * the site. QA verifies against design/README.md §2 at 1440x900 and
+ * 390x844.
+ */
+
+import { Image } from "astro:assets";
+import heroChain from "../../design/assets/hero-chain-wide.png";
+import chainZoom from "../../design/assets/chain-zoom.png";
+---
+
+<section class="hero" aria-labelledby="hero-heading">
+  <span class="kicker">Root-cause analysis for automotive software</span>
+  <h1 id="hero-heading" class="hero-heading">
+    We move developers from a bug ticket to the next step. Within hours, not days.
+  </h1>
+  <p class="subhead">
+    From a log line to the code that caused it, with the evidence to prove it.
+  </p>
+  <div class="cta-row">
+    <a class="btn-primary" href="mailto:michel@snappautomotive.io">
+      Talk to us about the evaluation
+    </a>
+  </div>
+
+  <figure class="hero-figure">
+    <div class="hero-frame">
+      <Image
+        src={heroChain}
+        alt="Basset causal chain graph view"
+        widths={[640, 1024, 1440, 1920]}
+        sizes="(max-width: 640px) 100vw, (max-width: 1120px) 92vw, 1120px"
+        class="hero-image"
+      />
+      <div class="zoom-card">
+        <Image
+          src={chainZoom}
+          alt="Zoomed causal chain segment: anchor to MARKER"
+          widths={[400, 600, 800]}
+          sizes="clamp(220px, 36%, 400px)"
+          class="zoom-image"
+        />
+      </div>
+    </div>
+    <figcaption class="caption">
+      The causal chain from the symptom back to the code, across process boundaries.
+    </figcaption>
+  </figure>
+</section>
+
+<style>
+  /* Section container — left-aligned block per the brief (never centered).
+     Padding-top matches the fluid clamp from the design reference. */
+  .hero {
+    padding-top: clamp(48px, 8vw, 88px);
+    text-align: left;
+  }
+
+  /* Kicker — mono, uppercase, spaced. text-transform lets the source
+     stay in sentence case (matching the design reference's markup) while
+     rendering in caps. */
+  .kicker {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-kicker);
+    letter-spacing: var(--letter-spacing-kicker);
+    text-transform: uppercase;
+    color: var(--color-accent-text);
+  }
+
+  /* H1 — the promise. The global h1 rule in BaseLayout already applies
+     the type tokens (family/size/weight/line-height/letter-spacing/
+     max-width 20ch); we only add the vertical rhythm and pin ink color
+     defensively so a global tweak cannot mute the heading. */
+  .hero-heading {
+    margin: 20px 0 0;
+    color: var(--color-ink);
+  }
+
+  /* Hero subhead — 18px/29px muted per the brief. Constrain the measure
+     so it wraps under the H1 in a comfortable column. */
+  .subhead {
+    margin: 20px 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-hero-subhead);
+    line-height: var(--line-height-hero-subhead);
+    color: var(--color-muted);
+    max-width: 52ch;
+  }
+
+  /* CTA row — a flex wrapper so future sibling CTAs can sit alongside
+     without touching the button rule. */
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 28px;
+  }
+
+  /* Primary button — solid accent, white 15px/600, 8px radius. */
+  .btn-primary {
+    display: inline-block;
+    background: var(--color-accent);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: var(--weight-semibold);
+    line-height: 1;
+    padding: 11px 20px;
+    border-radius: var(--radius-button);
+    text-decoration: none;
+  }
+
+  .btn-primary:hover {
+    background: var(--color-accent-hover);
+  }
+
+  .btn-primary:focus-visible {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
+  }
+
+  /* Hero figure — the outer semantic figure. It no longer needs
+     positioning: the zoom card is now anchored to .hero-frame (see
+     below), so the figure holds only its top gap from the CTA above
+     and lets the frame + caption flow normally. */
+  .hero-figure {
+    margin: clamp(36px, 5vw, 56px) 0 0;
+    padding: 0;
+  }
+
+  /* Hero frame — the white bordered card that holds the hero screenshot
+     and anchors the overlapping zoom card. position: relative so the
+     zoom card's absolute positioning is scoped to just this frame, not
+     the full figure (which would include the caption and cause the
+     zoom card to visually crash into it at narrow-mid widths).
+     overflow stays visible so the zoom card can extend past the frame's
+     bottom-right corner; the hero image itself clips to the 12px radius
+     via its own border-radius rule below.
+
+     margin-bottom is the trailing spacer between the frame and the
+     caption. The design brief specifies clamp(40px, 6vw, 72px); the
+     zoom card's fixed 48px bottom overhang would leave up to 8px of
+     caption overlap at any viewport where 6vw < 48px (~<800px). Because
+     the zoom card is hidden below 481px (see .zoom-card media query),
+     we bump the floor to 48px only while the card is visible so the
+     caption clears the overhang; below that we use the brief's floor
+     of 40px verbatim. The 6vw growth and 72px cap are unchanged. */
+  .hero-frame {
+    position: relative;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-hero-figure);
+    margin-bottom: clamp(48px, 6vw, 72px);
+  }
+
+  @media (max-width: 480px) {
+    .hero-frame {
+      margin-bottom: clamp(40px, 6vw, 72px);
+    }
+  }
+
+  /* Hero image — a block image that fills the frame, respecting the
+     source aspect ratio (3176/2100). Astro's <Image> emits width/height
+     attributes from the imported source, so the aspect ratio is preserved
+     without CLS. */
+  .hero-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-card);
+  }
+
+  /* Zoom card — the 1:1 crop overlapping the hero's bottom-right corner
+     per the brief. Width scales with the viewport. */
+  .zoom-card {
+    position: absolute;
+    right: -8px;
+    bottom: -48px;
+    width: clamp(220px, 36%, 400px);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-zoom-card);
+    overflow: hidden;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-zoom-card);
+  }
+
+  .zoom-image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Hide the zoom card on very narrow viewports where its 36% width
+     would crowd the caption — per the brief's responsive note. */
+  @media (max-width: 480px) {
+    .zoom-card {
+      display: none;
+    }
+  }
+
+  /* Caption — 13px/20px muted; sits 20px below the hero frame. */
+  .caption {
+    margin: 20px 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-figure-caption);
+    line-height: var(--line-height-figure-caption);
+    color: var(--color-muted);
+    max-width: 48ch;
+  }
+</style>
