@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+body { margin: 0; background: #fcfcfc; color: #1c1e21; font-family: 'IBM Plex Sans', sans-serif; text-wrap: pretty; }
+a { color: #157347; }
+a:hover { color: #0f5c37; }
+</style>
+</helmet>
+<div style="min-height:100vh;">
+  <nav style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:16px clamp(20px,5vw,64px);background:#fff;border-bottom:1px solid #e6e8ea;">
+    <span style="font-weight:700;font-size:19px;letter-spacing:-0.01em;">Basset</span>
+    <span style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5f6670;">by Snapp Automotive × <img src="basset_page_assets/mugo-mark.svg" alt="" style="width:18px;height:18px;"> mugo works</span>
+    <span style="flex:1;"></span>
+    <a href="{{ mailtoHref }}" style="font-size:13.5px;font-weight:500;color:#157347;text-decoration:none;" style-hover="color:#0f5c37;">Bring us a bug that cost you days. Talk to us.</a>
+  </nav>
+  <div style="max-width:1120px;margin:0 auto;padding:0 clamp(20px,5vw,64px);">
+
+    <div style="padding:clamp(48px,8vw,88px) 0 0;">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:0.12em;text-transform:uppercase;color:#157347;">Root-cause analysis for automotive software</span>
+      <h1 style="font-family:'IBM Plex Sans',sans-serif;font-size:clamp(34px,4.6vw,52px);line-height:1.15;font-weight:600;letter-spacing:-0.025em;margin:20px 0 0;max-width:20ch;">We move developers from a bug ticket to the next step. Within hours, not days.</h1>
+      <p style="font-size:18px;line-height:29px;color:#5f6670;margin:20px 0 0;max-width:52ch;">From a log line to the code that caused it, with the evidence to prove it.</p>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:28px;">
+        <a href="{{ mailtoHref }}" style="background:#1d9a5e;color:#fff;font-size:15px;font-weight:600;padding:11px 20px;border-radius:8px;text-decoration:none;" style-hover="background:#178350;">Talk to us about the evaluation</a>
+      </div>
+      <figure style="margin:clamp(36px,5vw,56px) 0 0;position:relative;">
+        <div style="border:1px solid #e6e8ea;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 24px 48px -20px rgba(23,24,26,0.18);">
+          <image-slot id="final-hero" shape="rect" fit="contain" src="basset_page_assets/hero-chain-wide.png" placeholder="hero-chain-wide.png" style="width:100%;aspect-ratio:3176/2100;"></image-slot>
+        </div>
+        <sc-if value="{{ showZoom }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;right:-8px;bottom:-48px;width:clamp(220px,36%,400px);border:1px solid #e6e8ea;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 20px 40px -12px rgba(23,24,26,0.25);">
+            <image-slot id="final-zoom" shape="rect" fit="contain" src="basset_page_assets/chain-zoom.png" placeholder="chain-zoom.png" style="width:100%;aspect-ratio:1100/500;"></image-slot>
+          </div>
+        </sc-if>
+        <figcaption style="font-size:13px;line-height:20px;color:#5f6670;margin:20px 0 0;max-width:48ch;">The causal chain from the symptom back to the code, across process boundaries.</figcaption>
+      </figure>
+      <div style="height:clamp(40px,6vw,72px);"></div>
+    </div>
+
+    <div style="padding:clamp(48px,6vw,72px) 0;border-top:1px solid #e6e8ea;">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:0.12em;text-transform:uppercase;color:#157347;">The promise</span>
+      <h2 style="font-family:'IBM Plex Sans',sans-serif;font-size:clamp(26px,3vw,32px);line-height:1.28;font-weight:600;letter-spacing:-0.02em;margin:16px 0 0;max-width:32ch;">With the logs you already have, you always end up with an evidence-backed next step.</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:40px;align-items:start;">
+        <div style="border:1px solid #e6e8ea;border-radius:12px;background:#fff;padding:24px;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#157347;">01</span>
+          <p style="font-size:17px;line-height:25px;font-weight:600;margin:10px 0 0;">The exact line of code, backed by evidence.</p>
+          <p style="font-size:14.5px;line-height:23px;color:#5f6670;margin:8px 0 0;">A causal chain, as in the view above.</p>
+        </div>
+        <div style="border:1px solid #e6e8ea;border-radius:12px;background:#fff;padding:24px;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#157347;">02</span>
+          <p style="font-size:17px;line-height:25px;font-weight:600;margin:10px 0 0;">A set of candidates with confidence levels and evidence.</p>
+          <div style="border:1px solid #e6e8ea;border-radius:8px;overflow:hidden;margin:14px 0 0;">
+            <image-slot id="final-cand" shape="rect" fit="cover" src="basset_page_assets/candidates-view.png" placeholder="candidates-view.png" style="width:100%;aspect-ratio:16/10;"></image-slot>
+          </div>
+        </div>
+        <div style="border:1px solid #e6e8ea;border-radius:12px;background:#fff;padding:24px;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#157347;">03</span>
+          <p style="font-size:17px;line-height:25px;font-weight:600;margin:10px 0 0;">A highlighted area where visibility fades and further instrumentation is required.</p>
+        </div>
+      </div>
+      <p style="font-size:18px;line-height:29px;font-weight:600;margin:40px 0 0;max-width:52ch;">This is slow, painstaking work only your experts could do manually. Now anyone on your team can move from a bug ticket to the next step.</p>
+    </div>
+
+    <div style="padding:clamp(48px,6vw,72px) 0;border-top:1px solid #e6e8ea;">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:0.12em;text-transform:uppercase;color:#157347;">The mechanism</span>
+      <h2 style="font-family:'IBM Plex Sans',sans-serif;font-size:clamp(26px,3vw,32px);line-height:1.28;font-weight:600;letter-spacing:-0.02em;margin:16px 0 0;">How it works, in one pass.</h2>
+      <p style="font-size:16px;line-height:26px;color:#5f6670;margin:20px 0 0;max-width:66ch;">Basset ingests your source and matches each runtime log line to the exact statement that produced it. No debug symbols needed. It then rebuilds the causal chain across process boundaries from what actually happened in the run, and you walk it clickably into the code. Every step is deterministic and inspectable: no hidden AI invents the answer.</p>
+      <figure style="margin:36px 0 0;">
+        <div style="border:1px solid #e6e8ea;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 16px 32px -16px rgba(23,24,26,0.14);">
+          <image-slot id="final-work" shape="rect" fit="contain" src="basset_page_assets/workspace-three-pane.png" placeholder="workspace-three-pane.png" style="width:100%;aspect-ratio:3176/2100;"></image-slot>
+        </div>
+        <figcaption style="font-size:13px;line-height:20px;color:#5f6670;margin:14px 0 0;">One workspace: the chain, the code it points to, and the logs that prove it.</figcaption>
+      </figure>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:clamp(24px,4vw,48px);align-items:center;margin-top:48px;">
+        <figure style="margin:0;">
+          <div style="border:1px solid #e6e8ea;border-radius:12px;overflow:hidden;background:#fff;">
+            <image-slot id="final-walk" shape="rect" fit="contain" src="basset_page_assets/walk-control.png" placeholder="walk-control.png" style="width:100%;aspect-ratio:3176/2100;"></image-slot>
+          </div>
+        </figure>
+        <p style="font-size:16px;line-height:26px;color:#5f6670;margin:0;max-width:38ch;">You drive the walk. The tool shows its evidence at every hop.</p>
+      </div>
+    </div>
+
+    <div style="padding:clamp(48px,6vw,72px) 0;border-top:1px solid #e6e8ea;">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:0.12em;text-transform:uppercase;color:#157347;">The research</span>
+      <h2 style="font-family:'IBM Plex Sans',sans-serif;font-size:clamp(26px,3vw,32px);line-height:1.28;font-weight:600;letter-spacing:-0.02em;margin:16px 0 0;">Built on how debugging actually works.</h2>
+      <p style="font-size:16px;line-height:26px;color:#5f6670;margin:20px 0 0;max-width:60ch;">Before building Basset we studied the research on how developers actually find root causes. Three findings shaped the product:</p>
+      <div style="display:grid;gap:0;margin-top:32px;border:1px solid #e6e8ea;border-radius:12px;background:#fff;overflow:hidden;">
+        <div style="display:grid;grid-template-columns:56px 1fr;gap:16px;padding:22px 24px;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#157347;">R1</span>
+          <p style="font-size:15.5px;line-height:25px;margin:0;"><strong>Developers spend roughly half of debugging time hunting for the right code, not fixing it.</strong> <span style="color:#5f6670;">So Basset attacks the hunt: from a log line straight to the statement that wrote it.</span></p>
+        </div>
+        <div style="display:grid;grid-template-columns:56px 1fr;gap:16px;padding:22px 24px;border-top:1px solid #e6e8ea;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#157347;">R2</span>
+          <p style="font-size:15.5px;line-height:25px;margin:0;"><strong>Ranked lists of &quot;suspicious lines&quot; fail in practice; developers need the causal story, not a leaderboard.</strong> <span style="color:#5f6670;">So Basset shows a walkable chain of what happened, with evidence at each step.</span></p>
+        </div>
+        <div style="display:grid;grid-template-columns:56px 1fr;gap:16px;padding:22px 24px;border-top:1px solid #e6e8ea;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#157347;">R3</span>
+          <p style="font-size:15.5px;line-height:25px;margin:0;"><strong>Engineers distrust tools that hide their reasoning.</strong> <span style="color:#5f6670;">So every Basset answer traces back to real code and the real run, and the tool says honestly where its visibility ends.</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:clamp(24px,4vw,48px);align-items:center;padding:clamp(48px,6vw,72px) 0;border-top:1px solid #e6e8ea;">
+      <div>
+        <h2 style="font-family:'IBM Plex Sans',sans-serif;font-size:clamp(26px,3vw,32px);line-height:1.28;font-weight:600;letter-spacing:-0.02em;margin:0;">It handles more than one kind of failure.</h2>
+        <p style="font-size:16px;line-height:26px;color:#5f6670;margin:18px 0 0;">A permission denial traced across processes, or a hard crash: seed the walk from any log record, including a stack frame.</p>
+      </div>
+      <figure style="margin:0;">
+        <div style="border:1px solid #e6e8ea;border-radius:12px;overflow:hidden;background:#fff;">
+          <image-slot id="final-crash" shape="rect" fit="contain" src="basset_page_assets/crash-trace.png" placeholder="crash-trace.png" style="width:100%;aspect-ratio:3176/2100;"></image-slot>
+        </div>
+        <figcaption style="font-size:13px;line-height:20px;color:#5f6670;margin:14px 0 0;">A crash trace: the walk connected the failing record to its cause along a real edge-path.</figcaption>
+      </figure>
+    </div>
+
+    <div style="padding:clamp(48px,6vw,72px) 0;border-top:1px solid #e6e8ea;">
+      <h2 style="font-family:'IBM Plex Sans',sans-serif;font-size:clamp(26px,3vw,32px);line-height:1.28;font-weight:600;letter-spacing:-0.02em;margin:0;">What Basset is not.</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:32px;">
+        <div>
+          <span style="display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#1c1e21;background:#eef0f2;padding:5px 10px;border-radius:6px;">not a log viewer</span>
+          <p style="font-size:14.5px;line-height:23px;color:#5f6670;margin:16px 0 0;">It starts where viewers stop.</p>
+        </div>
+        <div>
+          <span style="display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#1c1e21;background:#eef0f2;padding:5px 10px;border-radius:6px;">not a cloud service</span>
+          <p style="font-size:14.5px;line-height:23px;color:#5f6670;margin:16px 0 0;">It runs where you decide, and your source and logs stay under your control.</p>
+        </div>
+        <div>
+          <span style="display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#1c1e21;background:#eef0f2;padding:5px 10px;border-radius:6px;">not an AI oracle</span>
+          <p style="font-size:14.5px;line-height:23px;color:#5f6670;margin:16px 0 0;">Deterministic evidence first, any AI sits on top to explain, never to invent.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin:0 0 clamp(48px,6vw,72px);border:1px solid #cdeeda;border-radius:16px;background:#ecf8f1;padding:clamp(28px,4vw,56px);display:flex;flex-wrap:wrap;gap:32px;align-items:center;justify-content:space-between;">
+      <div style="max-width:60ch;">
+        <h3 style="font-family:'IBM Plex Sans',sans-serif;font-size:clamp(24px,3vw,30px);line-height:1.28;font-weight:600;letter-spacing:-0.02em;margin:0;">Bring us a bug that cost you days.</h3>
+        <p style="font-size:15.5px;line-height:25px;color:#41564a;margin:16px 0 0;max-width:52ch;">Basset is in development and we are taking a small number of early partners. You bring real tickets with logs, we prove it on your hardest cases, and early partners pay roughly half the standard price for the first year.</p>
+      </div>
+      <a href="{{ mailtoHref }}" style="background:#1d9a5e;color:#fff;font-size:15px;font-weight:600;padding:12px 22px;border-radius:8px;text-decoration:none;white-space:nowrap;" style-hover="background:#178350;">Talk to us about the evaluation</a>
+    </div>
+
+  </div>
+  <div style="border-top:1px solid #e6e8ea;background:#fff;padding:22px clamp(20px,5vw,64px);font-size:13px;color:#5f6670;font-family:'IBM Plex Mono',monospace;">Basset, a collaboration between <a href="https://www.snappautomotive.io" style="color:#157347;">Snapp Automotive</a> and <a href="https://www.mugoworks.com" style="color:#157347;white-space:nowrap;"><img src="basset_page_assets/mugo-mark.svg" alt="" style="width:15px;height:15px;vertical-align:-3px;margin-right:4px;">mugo works</a></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;email&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;michel@snappautomotive.io&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contact&quot;},&quot;showZoom&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Hero&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const email = this.props.email ?? 'michel@snappautomotive.io';
+    return {
+      email,
+      mailtoHref: 'mailto:' + email,
+      showZoom: this.props.showZoom ?? true,
+    };
+  }
+}
+</script>
+</body>
+</html>
