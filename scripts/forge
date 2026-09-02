@@ -219,16 +219,16 @@ case "$cmd" in
     [ $# -eq 1 ] || die "usage: forge status <pr>"
     pr="$1"
     if [ -n "$DRY_RUN" ]; then
-      printf 'gh pr view %s --repo %s --json number,state,mergeable,mergeStateStatus,statusCheckRollup\n' \
+      printf 'gh pr view %s --repo %s --json number,state,mergeable,mergeStateStatus,statusCheckRollup,mergedAt\n' \
         "$pr" "$FORGE_REPO"
       exit 0
     fi
     gh pr view "$pr" --repo "$FORGE_REPO" \
-      --json number,state,mergeable,mergeStateStatus,statusCheckRollup,isMerged \
+      --json number,state,mergeable,mergeStateStatus,statusCheckRollup,mergedAt \
       | jq -c '{
           number,
           state: (.state|ascii_downcase),
-          merged: .isMerged,
+          merged: (.mergedAt != null),
           mergeable: .mergeable,
           merge_state: .mergeStateStatus,
           ci: ((.statusCheckRollup // []) | if length==0 then "unknown"
