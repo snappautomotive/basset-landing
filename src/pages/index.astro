@@ -1,11 +1,15 @@
 ---
-// Landing page placeholder. The full design brief content lands in follow-up
-// beads (dox.2 through dox.10); this bead only establishes the shared design
-// system: tokens, font loading, base layout, and site meta.
+// Landing page. The Nav bar (design/README.md §1) lands here; the hero and
+// the remaining sections arrive in beads dox.3+. The nav sits outside the
+// centred .content column so its white surface and 1px hairline reach the
+// viewport edges — the nav's own padding uses --content-padding-x to keep
+// its inner edges aligned with the content below it.
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Nav from "../components/Nav.astro";
 ---
 
 <BaseLayout>
+  <Nav />
   <main class="content">
     <h1>Basset</h1>
   </main>
