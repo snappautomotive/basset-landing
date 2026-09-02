@@ -1,0 +1,95 @@
+/*
+ * Design tokens for the Basset landing page.
+ *
+ * Every value here is fixed by design/README.md (the design brief). Component
+ * CSS in this project reads from these custom properties instead of hard-
+ * coding hexes, sizes, or clamp() expressions — so a token change ripples to
+ * every section, and QA can verify against the brief by grepping for the
+ * value once.
+ *
+ * Grouping mirrors the brief: colors, typography, spacing & shape.
+ */
+
+:root {
+  /* ---------- Colors ---------- */
+  /* Names follow the brief's "Role" column verbatim. */
+  --color-ground: #fcfcfc;              /* Page ground */
+  --color-surface: #ffffff;             /* Card / panel surface */
+  --color-hairline: #e6e8ea;            /* Hairline border */
+  --color-ink: #1c1e21;                 /* Ink (headings, body) */
+  --color-muted: #5f6670;               /* Muted text */
+  --color-accent: #1d9a5e;              /* Accent (buttons, solid fills) */
+  --color-accent-hover: #178350;        /* Accent hover */
+  --color-accent-text: #157347;         /* Accent text/links (AA on white) */
+  --color-link-hover: #0f5c37;          /* Link hover */
+  --color-tag-fill: #eef0f2;            /* Tag fill (neutral) */
+  --color-cta-fill: #ecf8f1;            /* CTA panel fill */
+  --color-cta-border: #cdeeda;          /* CTA panel border */
+  --color-cta-muted: #41564a;           /* CTA panel muted text */
+
+  /* ---------- Typography ---------- */
+
+  /* Font stacks. Google-hosted IBM Plex Sans/Mono lead; the fallbacks match
+     the platform's system UI font so a FOUT stays legible. */
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, "SF Mono",
+    Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Weights the brief allows — sans 400/500/600/700, mono 400/500/600. */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Line-heights used by the type scale below. Ratios for the display
+     headings (H1/H2/H3), pixel values for the fixed-size text (which the
+     brief specifies as "size / line-height" pairs). */
+  --line-height-h1: 1.15;
+  --line-height-h2: 1.28;
+  --line-height-h3: 1.28;
+  --line-height-hero-subhead: 29px;
+  --line-height-body: 26px;
+  --line-height-emphasis: 29px;
+  --line-height-card-title: 25px;
+  --line-height-card-body: 23px;
+  --line-height-figure-caption: 20px;
+
+  /* Type scale. Sizes marked clamp() are fluid per the brief; the rest are
+     fixed pixel values from the brief's typography table. */
+  --font-size-h1: clamp(34px, 4.6vw, 52px);
+  --font-size-h2: clamp(26px, 3vw, 32px);
+  --font-size-h3: clamp(24px, 3vw, 30px);
+  --font-size-hero-subhead: 18px;
+  --font-size-body: 16px;
+  --font-size-emphasis: 18px;
+  --font-size-card-title: 17px;
+  --font-size-card-body: 14.5px;
+  --font-size-kicker: 12.5px;
+  --font-size-figure-caption: 13px;
+  --font-size-footer: 13px;
+
+  /* Letter-spacing for the display headings and the mono kicker. */
+  --letter-spacing-h1: -0.025em;
+  --letter-spacing-h2: -0.02em;
+  --letter-spacing-h3: -0.02em;
+  --letter-spacing-kicker: 0.12em;
+
+  /* ---------- Spacing ---------- */
+  --content-max-width: 1120px;
+  --content-padding-x: clamp(20px, 5vw, 64px);
+  --section-padding-y: clamp(48px, 6vw, 72px);
+
+  /* ---------- Radii ---------- */
+  --radius-card: 12px;         /* cards/figures */
+  --radius-screenshot: 8px;    /* nested screenshots */
+  --radius-button: 8px;        /* buttons */
+  --radius-tag: 6px;            /* tags */
+  --radius-cta-panel: 16px;    /* CTA panel */
+  --radius-zoom-card: 10px;    /* hero zoom card */
+
+  /* ---------- Shadows ---------- */
+  --shadow-hero-figure: 0 24px 48px -20px rgba(23, 24, 26, 0.18);
+  --shadow-zoom-card: 0 20px 40px -12px rgba(23, 24, 26, 0.25);
+  --shadow-workspace-figure: 0 16px 32px -16px rgba(23, 24, 26, 0.14);
+}

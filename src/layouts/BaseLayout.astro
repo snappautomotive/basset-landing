@@ -1,0 +1,128 @@
+---
+/**
+ * BaseLayout — the site wrapper for every page.
+ *
+ * Applies the tokens from src/styles/tokens.css as the global look (page
+ * ground background, ink body color, IBM Plex Sans, and text-wrap: pretty)
+ * and exposes a .content wrapper for section layouts. Loads IBM Plex Sans
+ * and IBM Plex Mono from Google Fonts with preconnect + display=swap.
+ *
+ * Also declares the site meta: title, description, Open Graph, Twitter card,
+ * canonical, and theme-color. Absolute URLs use the site's base path so
+ * GitHub Pages serves them correctly.
+ */
+
+import "../styles/tokens.css";
+
+// Site copy fixed by design/README.md. Kept alongside the meta tags that
+// consume them so QA can verify the exact strings in one place.
+const title = "Basset — Root-cause analysis for automotive software";
+const description =
+  "From a log line to the code that caused it, with the evidence to prove it.";
+const siteUrl = "https://snappautomotive.github.io/basset-landing/";
+const ogImageUrl = "https://snappautomotive.github.io/basset-landing/og-hero.png";
+// Native dimensions of design/assets/hero-chain-wide.png — the source that
+// public/og-hero.png is copied from.
+const ogImageWidth = "3176";
+const ogImageHeight = "2100";
+// Matches --color-ground so the browser chrome (and the initial paint on
+// slow networks) blends into the page ground.
+const themeColor = "#fcfcfc";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content={themeColor} />
+    <link rel="canonical" href={siteUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={siteUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content={ogImageWidth} />
+    <meta property="og:image:height" content={ogImageHeight} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <!-- Fonts: preconnect first so the DNS/TLS handshake overlaps the
+         stylesheet request; display=swap keeps the fallback readable while
+         IBM Plex loads. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  /* text-wrap: pretty applies globally per the brief. */
+  html {
+    text-wrap: pretty;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Centered content column used by every section. */
+  .content {
+    max-width: var(--content-max-width);
+    margin-inline: auto;
+    padding-inline: var(--content-padding-x);
+  }
+
+  /* Base heading rhythm — sections may override sizing/max-widths, but the
+     typography tokens are the single source of truth for weight, line-
+     height, and letter-spacing. */
+  h1 {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-h1);
+    font-weight: var(--weight-semibold);
+    line-height: var(--line-height-h1);
+    letter-spacing: var(--letter-spacing-h1);
+    max-width: 20ch;
+  }
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-h2);
+    font-weight: var(--weight-semibold);
+    line-height: var(--line-height-h2);
+    letter-spacing: var(--letter-spacing-h2);
+  }
+
+  h3 {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-h3);
+    font-weight: var(--weight-semibold);
+    line-height: var(--line-height-h3);
+    letter-spacing: var(--letter-spacing-h3);
+  }
+</style>
