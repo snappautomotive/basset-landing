@@ -1,5 +1,5 @@
 ---
-name: planning
+name: ba_planning
 description: >-
   Turn a feature, requirement, or goal into well-formed beads ready to work — testable
   acceptance criteria, correct type and priority, dependencies, and a per-ticket decision on

@@ -42,7 +42,7 @@ your project's binding domain language (the mechanism is core; the words are you
 ## Skills (`.claude/skills/*/SKILL.md`)
 
 - **orchestrate** — the main dev → QA → PR loop; owns bead state and git sync.
-- **planning** — turn a feature/goal into well-formed beads.
+- **ba_planning** — turn a feature/goal into well-formed beads.
 - **review** — read-only in-depth codebase review → dated document under reviews/.
 - **docs-gardening** — cleanup sweep of docs/ for staleness/contradiction.
 - **setup** — one-time, re-runnable: verify environment, check the adapters are filled

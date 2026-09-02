@@ -11,7 +11,7 @@ description: >-
 
 Take a question or concern and produce a researched, evidence-backed review. This is
 **read-only**: you investigate and write a document; you do not change product code or bead
-state. If the review surfaces work worth doing, recommend beads for the `planning` skill to file —
+state. If the review surfaces work worth doing, recommend beads for the `ba_planning` skill to file —
 do not create them here.
 
 ## 1. Frame the question
@@ -47,7 +47,7 @@ Write to `reviews/YYYY-MM-DD[-HHMM]-<slug>.md`, newest sorting last. Cover:
 - **Summary** — the verdict up front, in a few sentences.
 - **Findings** — what the code actually does, each backed by `path:line` references.
 - **Recommendations** — concrete next steps, and any beads worth filing (as suggestions, for
-  the `planning` skill).
+  the `ba_planning` skill).
 
 Keep it concise and professional. State conclusions plainly; mark uncertainty as uncertainty.
 Write in the project's domain language ([`terminology.md`](../../../docs/guide/terminology.md)) —
