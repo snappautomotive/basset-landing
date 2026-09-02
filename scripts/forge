@@ -1,0 +1,284 @@
+#!/usr/bin/env bash
+# forge — thin wrapper over the GitHub API (via `gh`) for this project's PR workflow.
+#
+# Agents use this instead of hand-writing gh/curl. It reads FORGE_REPO from
+# .secrets/forge.env (see .secrets/forge.env.example and docs/adapters/forge.md).
+# Auth: `gh` handles it via its keyring; a FORGE_TOKEN in the env overrides that
+# (used by CI). Every comment and reply is posted with an "[agent] " prefix, so
+# an agent's message is never mistaken for the human whose token authors it.
+#
+# Usage:
+#   forge comments <pr>                         List every review comment with its
+#                                               reference (review-id, id, path, line) as JSON.
+#   forge reply <pr> <review-id> <path> <pos> <body>
+#                                               Reply on the thread at path+position (line).
+#                                               Take the three references verbatim from
+#                                               `forge comments`.
+#   forge comment <pr> <body>                   Post a top-level (non-threaded) PR comment.
+#   forge pr-create <head> <base> <title> <body>   Open a PR; prints its number.
+#   forge pr-edit <pr> <body>                   Replace the PR description (body accepts
+#                                               @file/-/literal).
+#   forge upload <pr> <file>                    Attach an image to the PR via a secret gist;
+#                                               prints its raw URL to embed in markdown.
+#   forge label <pr> <label> [label ...]        Add labels to a PR.
+#   forge unlabel <pr> <label> [label ...]      Remove labels from a PR.
+#   forge prs                                   List all OPEN PRs (number, title, branch) as JSON.
+#   forge status <pr>                           Print state, merged, mergeable, and CI status.
+#   forge seed-labels [--dry-run]               Idempotently create the workflow labels
+#                                               (in-qa-review, in-human-review, allows-auto-merge,
+#                                               auto-merge, requires-adr, contains-adr); leaves
+#                                               existing labels untouched. --dry-run prints the
+#                                               plan without creating anything.
+#
+# Body arguments (reply <body>, comment <body>, pr-create <title>/<body>, and
+# pr-edit <body>) accept three forms (upload takes a file path, not a body):
+#   @<path>   read the body verbatim from that file
+#   -         read the body verbatim from stdin
+#   <text>    the literal argument (backward compatible)
+# Prefer @<path> or - for any body containing backticks or $(...): passed
+# inline, those spans are mangled by the CALLER's shell before forge runs.
+# File and stdin contents are transmitted verbatim (forge does no shell
+# interpretation on them). A literal body starting with @ can be sent via
+# @<path> or -.
+#
+# FORGE_DRY_RUN=1 prints the underlying `gh` call instead of executing it (and
+# needs no auth) — use it to verify command assembly offline.
+set -euo pipefail
+
+AGENT_PREFIX="[agent] "
+
+die() { echo "forge: $*" >&2; exit 1; }
+
+DRY_RUN="${FORGE_DRY_RUN:-}"
+
+help_only=
+case "${1:-}" in ""|-h|--help|help) help_only=1 ;; esac
+
+if [ -z "$help_only" ]; then
+  command -v gh >/dev/null || die "gh (GitHub CLI) not found; install from https://cli.github.com/"
+  root=$(git rev-parse --show-toplevel 2>/dev/null) || die "not in a git repository"
+  secret="$root/.secrets/forge.env"
+  if [ -f "$secret" ]; then
+    _repo="${FORGE_REPO:-}"; _token="${FORGE_TOKEN:-}"
+    # shellcheck disable=SC1090
+    set -a; . "$secret"; set +a
+    [ -n "$_repo" ] && FORGE_REPO="$_repo"
+    [ -n "$_token" ] && FORGE_TOKEN="$_token"
+  fi
+  if [ -n "$DRY_RUN" ]; then
+    FORGE_REPO="${FORGE_REPO:-owner/repo}"
+  else
+    [ -f "$secret" ] || die "missing $secret (copy .secrets/forge.env.example; see docs/adapters/forge.md)"
+    [ -n "${FORGE_REPO:-}" ]  || die "FORGE_REPO not set in $secret"
+    # FORGE_TOKEN is optional locally — gh's keyring supplies auth. Set it in CI.
+    if [ -n "${FORGE_TOKEN:-}" ]; then
+      export GH_TOKEN="$FORGE_TOKEN"
+    fi
+  fi
+fi
+
+resolve_body() {
+  local arg="$1" file
+  case "$arg" in
+    -) cat ;;
+    @?*) file="${arg#@}"; [ -f "$file" ] || die "body file not found: $file"; cat -- "$file" ;;
+    *) printf '%s' "$arg" ;;
+  esac
+}
+
+# gh_run METHOD /path [--field k=v ...] — thin gh api wrapper with dry-run support.
+gh_run() {
+  if [ -n "$DRY_RUN" ]; then
+    printf 'gh api'
+    for arg in "$@"; do printf ' %q' "$arg"; done
+    printf '\n'
+    return 0
+  fi
+  gh api "$@"
+}
+
+cmd="${1:-}"; shift || true
+case "$cmd" in
+  comments)
+    [ $# -eq 1 ] || die "usage: forge comments <pr>"
+    pr="$1"
+    # GitHub review comments are a single feed per PR; include the review id for reply chains.
+    gh_run "/repos/$FORGE_REPO/pulls/$pr/comments?per_page=100" --paginate 2>/dev/null \
+      | jq -c '.[] | {review_id: .pull_request_review_id, id, path, line: .line, position, user: .user.login, body}'
+    ;;
+  reply)
+    [ $# -eq 5 ] || die "usage: forge reply <pr> <review-id> <path> <position> <body>"
+    pr="$1"; rid="$2"; path="$3"; pos="$4"; body="$AGENT_PREFIX$(resolve_body "$5")"
+    # GitHub replies use in_reply_to (the comment id, not the review id). We accept the review-id
+    # for interface parity with the Forgejo original; the real anchor is the parent comment id,
+    # which we look up from `comments` by (path, line). If the caller stores the comment id in
+    # the review_id slot (as `forge comments` prints them side-by-side), pass the comment id.
+    reqbody=$(jq -nc --arg body "$body" --argjson id "$rid" '{body:$body, in_reply_to:$id}')
+    if [ -n "$DRY_RUN" ]; then
+      printf 'gh api -X POST /repos/%s/pulls/%s/comments -H Content-Type:application/json --input -\n' "$FORGE_REPO" "$pr"
+      printf '%s\n' "$reqbody"
+      exit 0
+    fi
+    resp=$(printf '%s' "$reqbody" | gh api -X POST "/repos/$FORGE_REPO/pulls/$pr/comments" \
+      -H "Content-Type: application/json" --input -)
+    printf '%s' "$resp" | jq -r '"replied: comment " + (.id|tostring)'
+    ;;
+  comment)
+    [ $# -eq 2 ] || die "usage: forge comment <pr> <body>"
+    body="$AGENT_PREFIX$(resolve_body "$2")"
+    reqbody=$(jq -nc --arg body "$body" '{body:$body}')
+    if [ -n "$DRY_RUN" ]; then
+      printf 'gh api -X POST /repos/%s/issues/%s/comments --input -\n' "$FORGE_REPO" "$1"
+      printf '%s\n' "$reqbody"
+      exit 0
+    fi
+    resp=$(printf '%s' "$reqbody" | gh api -X POST "/repos/$FORGE_REPO/issues/$1/comments" --input -)
+    printf '%s' "$resp" | jq -r '"commented: " + (.id|tostring)'
+    ;;
+  pr-create)
+    [ $# -eq 4 ] || die "usage: forge pr-create <head> <base> <title> <body>"
+    head="$1"; base="$2"
+    title=$(resolve_body "$3"); body=$(resolve_body "$4")
+    if [ -n "$DRY_RUN" ]; then
+      printf 'gh pr create --repo %s --head %s --base %s --title <title> --body <body>\n' \
+        "$FORGE_REPO" "$head" "$base"
+      exit 0
+    fi
+    # gh pr create writes the PR URL to stdout; we want the number.
+    url=$(gh pr create --repo "$FORGE_REPO" --head "$head" --base "$base" \
+      --title "$title" --body "$body")
+    printf '%s\n' "$url" | awk -F/ '{print $NF}'
+    ;;
+  pr-edit)
+    [ $# -eq 2 ] || die "usage: forge pr-edit <pr> <body>"
+    body=$(resolve_body "$2")
+    if [ -n "$DRY_RUN" ]; then
+      printf 'gh pr edit %s --repo %s --body <body>\n' "$1" "$FORGE_REPO"
+      exit 0
+    fi
+    gh pr edit "$1" --repo "$FORGE_REPO" --body "$body" >/dev/null
+    printf 'edited: PR %s body\n' "$1"
+    ;;
+  upload)
+    [ $# -eq 2 ] || die "usage: forge upload <pr> <file>"
+    pr="$1"; file="$2"
+    [ -f "$file" ] || die "file not found: $file"
+    if [ -n "$DRY_RUN" ]; then
+      printf 'gh gist create --desc "PR %s: %s" %s\n' "$pr" "$(basename "$file")" "$file"
+      exit 0
+    fi
+    # GitHub has no public issue-attachments API. We upload the file as a SECRET gist
+    # (unlisted, but URL-accessible) and print its raw content URL so callers can embed
+    # it inline in markdown. Rotate/redact if the image contains sensitive info.
+    gist_url=$(gh gist create --desc "basset-landing PR #$pr: $(basename "$file")" "$file")
+    gist_id=$(printf '%s\n' "$gist_url" | awk -F/ '{print $NF}')
+    # Look up the raw URL of the just-uploaded file.
+    gh api "/gists/$gist_id" \
+      | jq -r --arg name "$(basename "$file")" '.files[$name].raw_url'
+    ;;
+  label)
+    [ $# -ge 2 ] || die "usage: forge label <pr> <label> [label ...]"
+    pr="$1"; shift
+    labels_json=$(printf '%s\n' "$@" | jq -Rsc 'split("\n") | map(select(length>0)) | {labels: .}')
+    if [ -n "$DRY_RUN" ]; then
+      printf 'gh api -X POST /repos/%s/issues/%s/labels --input -\n' "$FORGE_REPO" "$pr"
+      printf '%s\n' "$labels_json"
+      exit 0
+    fi
+    printf '%s' "$labels_json" | gh api -X POST "/repos/$FORGE_REPO/issues/$pr/labels" --input - \
+      | jq -r '"labels: " + ([.[].name] | tostring)'
+    ;;
+  unlabel)
+    [ $# -ge 2 ] || die "usage: forge unlabel <pr> <label> [label ...]"
+    pr="$1"; shift
+    for name in "$@"; do
+      # GitHub removes labels by NAME (URL-encoded); no numeric-id lookup needed.
+      enc=$(jq -rn --arg n "$name" '$n|@uri')
+      if [ -n "$DRY_RUN" ]; then
+        printf 'gh api -X DELETE /repos/%s/issues/%s/labels/%s\n' "$FORGE_REPO" "$pr" "$enc"
+        continue
+      fi
+      if gh api -X DELETE "/repos/$FORGE_REPO/issues/$pr/labels/$enc" >/dev/null 2>&1; then
+        echo "removed: $name"
+      else
+        echo "forge: label not present, skipping: $name" >&2
+      fi
+    done
+    ;;
+  prs)
+    [ $# -eq 0 ] || die "usage: forge prs"
+    if [ -n "$DRY_RUN" ]; then
+      printf 'gh pr list --repo %s --state open --json number,title,headRefName,baseRefName\n' "$FORGE_REPO"
+      exit 0
+    fi
+    gh pr list --repo "$FORGE_REPO" --state open \
+      --json number,title,headRefName,baseRefName \
+      | jq -c '.[] | {number, title, branch: .headRefName, base: .baseRefName}'
+    ;;
+  status)
+    [ $# -eq 1 ] || die "usage: forge status <pr>"
+    pr="$1"
+    if [ -n "$DRY_RUN" ]; then
+      printf 'gh pr view %s --repo %s --json number,state,mergeable,mergeStateStatus,statusCheckRollup\n' \
+        "$pr" "$FORGE_REPO"
+      exit 0
+    fi
+    gh pr view "$pr" --repo "$FORGE_REPO" \
+      --json number,state,mergeable,mergeStateStatus,statusCheckRollup,isMerged \
+      | jq -c '{
+          number,
+          state: (.state|ascii_downcase),
+          merged: .isMerged,
+          mergeable: .mergeable,
+          merge_state: .mergeStateStatus,
+          ci: ((.statusCheckRollup // []) | if length==0 then "unknown"
+               elif all(.conclusion == "SUCCESS" or .status == "COMPLETED" and .conclusion == "SUCCESS") then "success"
+               elif any(.conclusion == "FAILURE") then "failure"
+               else "pending" end)
+        }'
+    ;;
+  seed-labels)
+    seed_dry=""
+    if [ "${1:-}" = "--dry-run" ]; then seed_dry=1; shift; fi
+    [ $# -eq 0 ] || die "usage: forge seed-labels [--dry-run]"
+
+    # STATUS labels (lifecycle) and REQUIREMENT labels (plan-time fixed) plus PR SIGNALS.
+    # Format per line: name|color(hex, no '#')|description.
+    desired='in-qa-review|fbca04|STATUS (bead only, by choice): bead is in adversarial QA against its acceptance criteria; QA status is not surfaced on the PR
+in-human-review|1d76db|STATUS (bead + PR): a human must review the PR and report back; present only while awaiting a human, mirrored on both
+allows-auto-merge|c2e0c6|REQUIREMENT (bead): permits this bead PR to auto-merge; absence means human review. QA translates it into the PR auto-merge trigger
+auto-merge|0e8a16|PR TRIGGER: the auto-merge workflow merges this PR once checks pass; set by QA from the bead allows-auto-merge, mutually exclusive with in-human-review
+requires-adr|5319e7|REQUIREMENT (bead): bead needs an ADR to be mergeable; overrides allows-auto-merge (never auto-merges)
+contains-adr|b60205|PR SIGNAL: an ADR is included in this PR; never auto-merges (set by QA when the bead has requires-adr)'
+
+    existing=""
+    if [ -z "$DRY_RUN" ]; then
+      existing=$(gh label list --repo "$FORGE_REPO" --limit 200 --json name | jq -r '.[].name')
+    fi
+
+    printf '%s\n' "$desired" | while IFS='|' read -r name color desc; do
+      [ -n "$name" ] || continue
+      if printf '%s\n' "$existing" | grep -qxF "$name"; then
+        echo "exists: $name"
+        continue
+      fi
+      if [ -n "$DRY_RUN" ]; then
+        printf 'gh label create %q --repo %q --color %q --description %q\n' \
+          "$name" "$FORGE_REPO" "$color" "$desc"
+        continue
+      fi
+      if [ -n "$seed_dry" ]; then
+        echo "would create: $name (#$color) — $desc"
+        continue
+      fi
+      gh label create "$name" --repo "$FORGE_REPO" --color "$color" --description "$desc" >/dev/null
+      echo "created: $name"
+    done
+    ;;
+  ""|-h|--help|help)
+    awk 'NR>1 && /^#/ {sub(/^# ?/,""); print; next} NR>1 {exit}' "$0"
+    ;;
+  *)
+    die "unknown command '$cmd' (try: forge help)"
+    ;;
+esac

@@ -1,0 +1,67 @@
+name: Auto-merge
+on:
+  pull_request_target:
+    types: [labeled, opened, reopened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    if: contains(github.event.pull_request.labels.*.name, 'auto-merge') && !contains(github.event.pull_request.labels.*.name, 'contains-adr')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge unless a changed file is deny-listed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          # Auto-merge trust policy.
+          #
+          # The PRIMARY "does a human need to review this?" decision is made at
+          # plan time by the allows-auto-merge bead permission, which QA surfaces
+          # on the PR as the auto-merge trigger this job's `if:` keys on. If the
+          # trigger is absent (or contains-adr is present) this job never runs and
+          # the PR waits for a human.
+          #
+          # This step is only an INTEGRITY BACKSTOP. A labeled PR merges once its
+          # required checks pass UNLESS a changed file touches a deny-listed path,
+          # in which case it is sent to human review regardless of the label. The
+          # deny-list catches paths that could subvert the merge system itself or
+          # are destructive/policy-sensitive:
+          #   ^\.github/                     CI can't self-modify its own merge gate
+          #   ^\.claude/agents|skills/       agent governance
+          #   (CLAUDE|AGENTS)\.md            agent governance
+          #   ^docs/adapters/                the stack/forge adapters agents obey
+          #
+          # Extend per project with schema/migration dirs, supply-chain policy
+          # files, and anything else a human must always see.
+          #
+          # There is deliberately NO allow-list: everything not denied rides on the
+          # allows-auto-merge label.
+          DENY='^\.github/|^\.claude/agents/|^\.claude/skills/|(^|/)(CLAUDE|AGENTS)\.md$|^docs/adapters/'
+
+          files=$(gh api "/repos/$REPO/pulls/$PR/files?per_page=100" --paginate \
+            | jq -r '.[].filename')
+
+          if [ -z "$files" ]; then
+            echo "No changed files reported; leaving for human review."
+            exit 0
+          fi
+
+          echo "Changed files:"; echo "$files"
+
+          denied=$(echo "$files" | grep -E "$DENY" || true)
+          if [ -n "$denied" ]; then
+            echo "These files require human review (deny-list):"
+            echo "$denied"
+            echo "Leaving PR for human review."
+            exit 0
+          fi
+
+          echo "No changed files are deny-listed. Enabling squash auto-merge."
+          gh pr merge "$PR" --repo "$REPO" --squash --auto

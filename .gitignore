@@ -1,0 +1,16 @@
+# Agent kit — required entries.
+.secrets/
+.beads/
+.claude/worktrees/
+.claude/settings.local.json
+
+# Node / Astro
+node_modules/
+dist/
+.astro/
+*.log
+.DS_Store
+
+# Editor
+.vscode/
+.idea/

@@ -1,0 +1,41 @@
+name: CI
+# This workflow is the source of truth for QA's "mirror CI locally" step: the
+# qa-verifier reproduces every gate here before opening a PR, and the stack
+# adapter's Quality gate section must list the same commands. When you add or
+# change a job here, update docs/adapters/stack.md in the same change.
+#
+# Branch protection should require every job below so auto-merge waits on them.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python (for the docs index generator)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Docs index is current and frontmatter is complete
+        run: python3 scripts/gen-doc-index --check
+
+  quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck (astro check)
+        run: npm run check
+      - name: Build
+        run: npm run build
