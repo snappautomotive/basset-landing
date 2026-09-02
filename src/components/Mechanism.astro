@@ -1,0 +1,199 @@
+---
+/**
+ * Mechanism — "The mechanism" section.
+ *
+ * Recreates design/README.md §4 (The mechanism) and the approved reference in
+ * design/design-reference/Basset Landing.dc.html exactly: a left-aligned
+ * section with the mono kicker "THE MECHANISM", the H2 explaining the
+ * mechanism in one pass, an intro paragraph, a workspace figure with
+ * caption, and a two-up row pairing the walk-control screenshot with a
+ * short muted paragraph. The section is separated from Promise above it
+ * by a 1px hairline top border — the global rule the brief specifies for
+ * section separation.
+ *
+ * Both product screenshots (workspace-three-pane.png and walk-control.png,
+ * both 3176x2100) are served through Astro's <Image> so the build emits
+ * multiple widths and a modern format via a <picture> with srcset — the
+ * brief calls all screenshots out for responsive delivery.
+ *
+ * Every color, size, spacing, radius, shadow, and copy string here is
+ * bound by the brief; values live in src/styles/tokens.css and are read
+ * through the token custom properties so a single change ripples across
+ * the site. QA verifies against design/README.md §4 at 1440x900 and
+ * 390x844.
+ */
+
+import { Image } from "astro:assets";
+import workspaceThreePane from "../../design/assets/workspace-three-pane.png";
+import walkControl from "../../design/assets/walk-control.png";
+---
+
+<section class="mechanism" aria-labelledby="mechanism-heading">
+  <span class="kicker">The mechanism</span>
+  <h2 id="mechanism-heading" class="mechanism-heading">
+    How it works, in one pass.
+  </h2>
+
+  <p class="intro">
+    Basset ingests your source and matches each runtime log line to the exact statement that produced it. No debug symbols needed. It then rebuilds the causal chain across process boundaries from what actually happened in the run, and you walk it clickably into the code. Every step is deterministic and inspectable: no hidden AI invents the answer.
+  </p>
+
+  <figure class="workspace-figure">
+    <div class="workspace-frame">
+      <Image
+        src={workspaceThreePane}
+        alt="The Basset workspace: chain, code, and logs"
+        widths={[640, 1024, 1440, 1920]}
+        sizes="(max-width: 640px) 100vw, (max-width: 1120px) 92vw, 1120px"
+        class="workspace-image"
+      />
+    </div>
+    <figcaption class="workspace-caption">
+      One workspace: the chain, the code it points to, and the logs that prove it.
+    </figcaption>
+  </figure>
+
+  <div class="walk-row">
+    <figure class="walk-figure">
+      <Image
+        src={walkControl}
+        alt="Walk-control menu on a chain node"
+        widths={[320, 640, 800, 1024]}
+        sizes="(max-width: 640px) 100vw, 46vw"
+        class="walk-image"
+      />
+    </figure>
+    <p class="walk-text">
+      You drive the walk. The tool shows its evidence at every hop.
+    </p>
+  </div>
+</section>
+
+<style>
+  /* Section container — the brief's global separation rule: a 1px hairline
+     top border between sections, with fluid vertical padding. Left-aligned
+     block, matching the hero and every other section. */
+  .mechanism {
+    border-top: 1px solid var(--color-hairline);
+    padding: var(--section-padding-y) 0;
+    text-align: left;
+  }
+
+  /* Kicker — mono, uppercase, spaced accent. text-transform lets the source
+     stay in sentence case (matching the design reference's markup) while
+     rendering in caps. */
+  .kicker {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-kicker);
+    letter-spacing: var(--letter-spacing-kicker);
+    text-transform: uppercase;
+    color: var(--color-accent-text);
+  }
+
+  /* Section H2 — the global h2 rule in BaseLayout already applies the type
+     tokens (family/size/weight/line-height/letter-spacing); we add the
+     vertical rhythm below the kicker and pin ink color defensively so a
+     global tweak cannot mute it. */
+  .mechanism-heading {
+    margin: 16px 0 0;
+    color: var(--color-ink);
+  }
+
+  /* Intro paragraph — 16px/26px muted per the brief. 66ch measure keeps
+     the line count balanced for the longer explanatory paragraph. */
+  .intro {
+    margin: clamp(20px, 3vw, 32px) 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    color: var(--color-muted);
+    max-width: 66ch;
+  }
+
+  /* Workspace figure — the outer semantic figure. margin resets padding
+     to zero so the frame + caption flow inside the section's own rhythm. */
+  .workspace-figure {
+    margin: clamp(28px, 4vw, 48px) 0 0;
+    padding: 0;
+  }
+
+  /* Workspace frame — the white bordered card that holds the workspace
+     screenshot. overflow: hidden clips the image to the 12px radius so
+     the corners remain crisp under the medium workspace shadow. */
+  .workspace-frame {
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-workspace-figure);
+    overflow: hidden;
+  }
+
+  /* Workspace image — a block image that fills the frame, respecting the
+     source aspect ratio (3176/2100). Astro's <Image> emits width/height
+     attributes from the imported source, so the aspect ratio is preserved
+     without CLS. */
+  .workspace-image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Workspace caption — 13px/20px muted; sits 12px below the frame. */
+  .workspace-caption {
+    margin: 12px 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-figure-caption);
+    line-height: var(--line-height-figure-caption);
+    color: var(--color-muted);
+  }
+
+  /* Two-up row — auto-fit + minmax(min(320px, 100%), 1fr) collapses two
+     columns to one below ~640px per the brief. The min(320px, 100%)
+     idiom lets each track shrink below 320px when the container is
+     narrower than that (e.g. a 320px viewport whose content column is
+     only 280px after --content-padding-x), which prevents horizontal
+     overflow at the narrow end of the range. At every wider width the
+     behaviour is unchanged — minmax resolves to minmax(320px, 1fr).
+     align-items: center vertically centers the walk-control screenshot
+     with the short muted paragraph at the wider breakpoint; source
+     order (figure first, paragraph second) means the image stacks
+     above the text when the row collapses to one column. */
+  .walk-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+    gap: clamp(24px, 4vw, 48px);
+    align-items: center;
+    margin-top: clamp(48px, 6vw, 72px);
+  }
+
+  /* Walk figure — a flat bordered frame (no shadow) at the nested-
+     screenshot radius. margin: 0 resets the browser's default figure
+     margins so the grid's gap is the sole source of separation. */
+  .walk-figure {
+    margin: 0;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-screenshot);
+    overflow: hidden;
+    background: var(--color-surface);
+  }
+
+  /* Walk image — a block image that fills the frame, respecting the
+     source aspect ratio (3176/2100). */
+  .walk-image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Walk text — 16px/26px muted, 38ch measure to keep the paragraph
+     visually paired with the screenshot at the wider breakpoint. */
+  .walk-text {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    color: var(--color-muted);
+    max-width: 38ch;
+  }
+</style>

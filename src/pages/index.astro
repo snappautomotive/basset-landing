@@ -5,11 +5,13 @@
 // edges aligned with the content below it. The Hero (design/README.md §2)
 // mounts inside .content and provides its own H1; Promise (design/README.md
 // §3) follows in the same column, separated by its own 1px hairline top
-// border. The remaining sections arrive in later beads.
+// border, and Mechanism (design/README.md §4) follows next with the same
+// separator rule. The remaining sections arrive in later beads.
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Nav from "../components/Nav.astro";
 import Hero from "../components/Hero.astro";
 import Promise from "../components/Promise.astro";
+import Mechanism from "../components/Mechanism.astro";
 ---
 
 <BaseLayout>
@@ -17,5 +19,6 @@ import Promise from "../components/Promise.astro";
   <main class="content">
     <Hero />
     <Promise />
+    <Mechanism />
   </main>
 </BaseLayout>
