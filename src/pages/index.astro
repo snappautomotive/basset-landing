@@ -3,16 +3,19 @@
 // .content column so its white surface and 1px hairline reach the viewport
 // edges — the nav's own padding uses --content-padding-x to keep its inner
 // edges aligned with the content below it. The Hero (design/README.md §2)
-// mounts inside .content and provides its own H1; the remaining sections
-// arrive in later beads.
+// mounts inside .content and provides its own H1; Promise (design/README.md
+// §3) follows in the same column, separated by its own 1px hairline top
+// border. The remaining sections arrive in later beads.
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Nav from "../components/Nav.astro";
 import Hero from "../components/Hero.astro";
+import Promise from "../components/Promise.astro";
 ---
 
 <BaseLayout>
   <Nav />
   <main class="content">
     <Hero />
+    <Promise />
   </main>
 </BaseLayout>
