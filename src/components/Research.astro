@@ -1,0 +1,203 @@
+---
+/**
+ * Research — "The research" section.
+ *
+ * Recreates design/README.md §5 (The research) and the approved reference in
+ * design/design-reference/Basset Landing.dc.html exactly: a left-aligned
+ * section with the mono kicker "THE RESEARCH", the H2 grounding statement,
+ * an intro paragraph, and a single bordered white 12px-radius list container
+ * holding three rows (R1/R2/R3). Each row pairs a mono accent label with a
+ * bold finding and a muted response. The section is separated from Mechanism
+ * above it by a 1px hairline top border — the global rule the brief specifies
+ * for section separation.
+ *
+ * Copy is verbatim per the brief. R2's finding contains straight double
+ * quotes around "suspicious lines" as written in design/README.md §5.
+ *
+ * No screenshots or product imagery — this section is text-only per the
+ * brief.
+ *
+ * Every color, size, spacing, radius, and copy string here is bound by the
+ * brief; values live in src/styles/tokens.css and are read through the token
+ * custom properties so a single change ripples across the site. QA verifies
+ * against design/README.md §5 at 1440x900, 900x wide, 390x844, and 320x wide
+ * (where the row's label column collapses above the finding).
+ */
+---
+
+<section class="research" aria-labelledby="research-heading">
+  <span class="kicker">The research</span>
+  <h2 id="research-heading" class="research-heading">
+    Built on how debugging actually works.
+  </h2>
+
+  <p class="intro">
+    Before building Basset we studied the research on how developers actually find root causes. Three findings shaped the product:
+  </p>
+
+  <div class="list">
+    <div class="row">
+      <span class="label">R1</span>
+      <div class="content">
+        <p class="finding">
+          Developers spend roughly half of debugging time hunting for the right code, not fixing it.
+        </p>
+        <p class="response">
+          So Basset attacks the hunt: from a log line straight to the statement that wrote it.
+        </p>
+      </div>
+    </div>
+
+    <div class="row">
+      <span class="label">R2</span>
+      <div class="content">
+        <p class="finding">
+          Ranked lists of "suspicious lines" fail in practice; developers need the causal story, not a leaderboard.
+        </p>
+        <p class="response">
+          So Basset shows a walkable chain of what happened, with evidence at each step.
+        </p>
+      </div>
+    </div>
+
+    <div class="row">
+      <span class="label">R3</span>
+      <div class="content">
+        <p class="finding">
+          Engineers distrust tools that hide their reasoning.
+        </p>
+        <p class="response">
+          So every Basset answer traces back to real code and the real run, and the tool says honestly where its visibility ends.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Section container — the brief's global separation rule: a 1px hairline
+     top border between sections, with fluid vertical padding. Left-aligned
+     block, matching the hero and every other section. */
+  .research {
+    border-top: 1px solid var(--color-hairline);
+    padding: var(--section-padding-y) 0;
+    text-align: left;
+  }
+
+  /* Kicker — mono, uppercase, spaced accent. text-transform lets the source
+     stay in sentence case (matching the design reference's markup) while
+     rendering in caps. */
+  .kicker {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-kicker);
+    letter-spacing: var(--letter-spacing-kicker);
+    text-transform: uppercase;
+    color: var(--color-accent-text);
+  }
+
+  /* Section H2 — the global h2 rule in BaseLayout already applies the type
+     tokens (family/size/weight/line-height/letter-spacing); we add the
+     vertical rhythm below the kicker and pin ink color defensively so a
+     global tweak cannot mute it. */
+  .research-heading {
+    margin: 16px 0 0;
+    color: var(--color-ink);
+  }
+
+  /* Intro paragraph — 16px/26px muted per the brief. 66ch measure keeps the
+     line count balanced under the H2. */
+  .intro {
+    margin: clamp(20px, 3vw, 32px) 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    color: var(--color-muted);
+    max-width: 66ch;
+  }
+
+  /* List container — a single bordered white card with a 12px radius that
+     holds the three rows. overflow: hidden clips the inter-row hairlines to
+     the radius so the dividers align cleanly with the container's rounded
+     edges. */
+  .list {
+    margin-top: clamp(24px, 3vw, 40px);
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  /* Row — a two-column grid with a fixed 56px label column and a fluid
+     content column. align-items: baseline drops the mono label onto the
+     first line of the finding at the wider breakpoint. The gap between
+     grid columns is 16px per the brief; row padding is 22px 24px. */
+  .row {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 16px;
+    align-items: baseline;
+    padding: 22px 24px;
+  }
+
+  /* Row divider — a 1px hairline between rows, applied to every row after
+     the first via the adjacent-sibling combinator. That leaves the first
+     row without a top border and the last row without a bottom border, so
+     both flush against the list container's rounded edges. */
+  .row + .row {
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  /* Row label — mono 12.5px 600 accent. The size matches the section
+     kicker's 12.5px per the brief's row spec. */
+  .label {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: var(--weight-semibold);
+    color: var(--color-accent-text);
+  }
+
+  /* Row content stack — holds the finding and its response. margin: 0 on
+     both paragraphs resets the browser default so the 6px gap between them
+     is the sole source of separation. */
+  .content {
+    margin: 0;
+  }
+
+  /* Finding — 16px/26px 600 ink. The bold weight and ink color contrast
+     the muted response below it. */
+  .finding {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    font-weight: var(--weight-semibold);
+    color: var(--color-ink);
+  }
+
+  /* Response — 16px/26px muted, 6px below the finding. */
+  .response {
+    margin: 6px 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    color: var(--color-muted);
+  }
+
+  /* Narrow-width responsive collapse — below ~420px the 56px label column
+     becomes cramped, so drop the row to a single column with the label
+     sitting on its own line above the finding. The label keeps a 4px gap
+     from the finding via its own bottom margin, and row padding tightens
+     slightly for the narrower viewport. */
+  @media (max-width: 420px) {
+    .row {
+      grid-template-columns: 1fr;
+      padding: 20px 20px;
+      gap: 8px;
+    }
+
+    .label {
+      margin-bottom: 4px;
+    }
+  }
+</style>
