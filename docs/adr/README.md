@@ -15,6 +15,7 @@ from the code or re-litigate settled trade-offs.
 
 | # | Date | Title | Status |
 |---|------|-------|--------|
+| 0001 | 2026-09-03 | [Stay on Astro 5.x for the static no-input landing page](2026-09-03-stay-on-astro-5-for-static-no-input-landing-page.md) | Accepted |
 
 <!-- Add a row per ADR, newest at the bottom. -->
 

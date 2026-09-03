@@ -30,6 +30,7 @@ renaming a doc.
 
 ### adr/
 
+- [ADR-0001 Stay on Astro 5.x for the static no-input landing page](adr/2026-09-03-stay-on-astro-5-for-static-no-input-landing-page.md) — Why the landing page stays on astro@^5.18.0 despite eight high-severity npm-audit advisories — none is reachable on a static site with no user-controlled input, and the Astro 7 upgrade currently breaks the build via an unrelated Rolldown tsconfig-resolver regression.
 - [ADR index & conventions](adr/README.md) — Index of architecture decision records and the one-file-per-decision / supersede-not-edit conventions.
 
 ### guide/
