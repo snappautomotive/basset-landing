@@ -69,16 +69,17 @@ This project has user-facing UI. QA runs the local render gate for any user-faci
 before its PR can carry `auto-merge` (see the development lifecycle's review gate).
 
 - Trigger paths: `src/**`, `public/**`, `astro.config.*`, `package.json`, `package-lock.json`
-- Harness: **Browser pane preview** — `preview_start` on `npm run preview`, then take
-  desktop (1440×900) and mobile (390×844) screenshots of every section the bead touches.
-  Compare against the design brief's fidelity notes (colors, typography, spacing, exact
-  copy). Attach the screenshots to the PR via `scripts/forge upload`.
+- Harness: **Browser pane preview** — `preview_start` on `npm run preview`, then use
+  `mcp__Claude_Browser__resize_window` to switch viewports between desktop 1440×900 and
+  mobile 390×844 and take screenshots of every section the bead touches. Compare against
+  the design brief's fidelity notes (colors, typography, spacing, exact copy). Attach the
+  screenshots to the PR via `scripts/forge upload`.
 
   Concrete steps QA follows:
   1. `npm ci && npm run build`
   2. `preview_start` the `preview` script.
-  3. For each changed section, `navigate` to its anchor and screenshot at desktop and
-     mobile widths.
+  3. For each changed section, `navigate` to its anchor and use `resize_window` to switch
+     between desktop 1440×900 and mobile 390×844, screenshotting at each viewport.
   4. Visual check against the tokens in `design/README.md` (once the design handoff is
      restored).
   5. `scripts/forge upload <pr> <png>` for each screenshot; embed in the PR body.
