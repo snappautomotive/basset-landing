@@ -129,10 +129,10 @@ None. Fully static page.
 ## Assets (`assets/`)
 - `hero-chain-wide.png` — causal-chain graph view (hero). 3176×2100.
 - `chain-zoom.png` — 1100×500 crop of the hero (anchor→MARKER segment) for the overlap card.
-- `candidates-view.png` — candidate list with confidence levels (card 02). 3176×2100.
-- `workspace-three-pane.png` — chain + source + logs workspace. 3176×2100.
-- `walk-control.png` — right-click walk-control menu on a node. 3176×2100.
-- `crash-trace.png` — crash/stack-frame trace view. 3176×2100.
+- `candidates-view.png` — candidate list with confidence levels (card 02). 2906×1866.
+- `workspace-three-pane.png` — chain + source + logs workspace. 3778×2132.
+- `walk-control.png` — right-click walk-control menu on a node. 2784×1824.
+- `crash-trace.png` — crash/stack-frame trace view. 2966×2048.
 - `mugo-mark.svg` — official mugo works pine mark, deep-green on light (from the mugo works brand system). Never recolor; on dark grounds request the on-dark variant from mugo works.
 - All screenshots are product UI provided by the client; serve them responsively (e.g. `srcset`) — they are large.
 
