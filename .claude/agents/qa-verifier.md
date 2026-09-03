@@ -6,7 +6,7 @@ description: >-
   pass it pushes the branch, opens the pull request, and carries the bead's labels onto it; on a
   fail it reports an actionable bounce. NEVER merges, closes, or writes bead state. Invoke after a
   dev-implementer commits a local branch for review.
-tools: Bash, Read, Grep, Glob, WebFetch, mcp__Claude_Browser__computer, mcp__Claude_Browser__navigate, mcp__Claude_Browser__read_page, mcp__Claude_Browser__find, mcp__Claude_Browser__get_page_text, mcp__Claude_Browser__javascript_tool, mcp__Claude_Browser__read_console_messages, mcp__Claude_Browser__read_network_requests, mcp__Claude_Browser__preview_start, mcp__Claude_Browser__preview_logs
+tools: Bash, Read, Grep, Glob, WebFetch, mcp__Claude_Browser__computer, mcp__Claude_Browser__navigate, mcp__Claude_Browser__read_page, mcp__Claude_Browser__find, mcp__Claude_Browser__get_page_text, mcp__Claude_Browser__javascript_tool, mcp__Claude_Browser__read_console_messages, mcp__Claude_Browser__read_network_requests, mcp__Claude_Browser__preview_start, mcp__Claude_Browser__preview_logs, mcp__Claude_Browser__resize_window
 model: sonnet
 ---
 
