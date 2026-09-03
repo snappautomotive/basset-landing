@@ -3,6 +3,6 @@ import { defineConfig } from "astro/config";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://snappautomotive.github.io/basset-landing",
-  base: "/basset-landing",
+  site: "https://basset.snappautomotive.io",
+  base: "/",
 });
