@@ -19,8 +19,8 @@ import "../styles/tokens.css";
 const title = "Basset — Root-cause analysis for automotive software";
 const description =
   "From a log line to the code that caused it, with the evidence to prove it.";
-const siteUrl = "https://snappautomotive.github.io/basset-landing/";
-const ogImageUrl = "https://snappautomotive.github.io/basset-landing/og-hero.png";
+const siteUrl = "https://basset.snappautomotive.io/";
+const ogImageUrl = "https://basset.snappautomotive.io/og-hero.png";
 // Native dimensions of design/assets/hero-chain-wide.png — the source that
 // public/og-hero.png is copied from.
 const ogImageWidth = "3176";
@@ -41,10 +41,11 @@ const themeColor = "#fcfcfc";
     <link rel="canonical" href={siteUrl} />
 
     <!-- Favicons: SVG for modern browsers, PNG fallbacks for older ones.
-         Paths carry the /basset-landing/ base so GitHub Pages resolves them. -->
-    <link rel="icon" type="image/svg+xml" href="/basset-landing/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/basset-landing/favicon-32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/basset-landing/favicon-16.png" />
+         The site is served from the custom apex path (base "/"), so these
+         are plain root-relative paths. -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
