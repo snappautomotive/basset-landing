@@ -40,6 +40,12 @@ const themeColor = "#fcfcfc";
     <meta name="theme-color" content={themeColor} />
     <link rel="canonical" href={siteUrl} />
 
+    <!-- Favicons: SVG for modern browsers, PNG fallbacks for older ones.
+         Paths carry the /basset-landing/ base so GitHub Pages resolves them. -->
+    <link rel="icon" type="image/svg+xml" href="/basset-landing/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/basset-landing/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/basset-landing/favicon-16.png" />
+
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
