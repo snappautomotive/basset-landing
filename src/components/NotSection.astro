@@ -1,0 +1,124 @@
+---
+/**
+ * NotSection — "What Basset is not." section.
+ *
+ * Recreates design/README.md §7 (What Basset is not) and the approved
+ * reference in design/design-reference/Basset Landing.dc.html exactly: a
+ * left-aligned section with **no kicker** (per the brief) whose sole body
+ * is the H2 followed by a three-column grid of mono-tag + muted-body
+ * clarifications. The section is separated from FailureModes above it by
+ * a 1px hairline top border — the global rule the brief specifies for
+ * section separation.
+ *
+ * Column tags are verbatim per the brief: "not a log viewer", "not a
+ * cloud service", "not an AI oracle". Bodies follow verbatim beneath.
+ *
+ * The three-column grid uses `minmax(min(240px, 100%), 1fr)` instead of
+ * the raw `minmax(240px, 1fr)` the brief cites. The natural three -> two
+ * -> one collapse the brief calls for is preserved at every wider width
+ * (the min() resolves to 240px whenever the container has room), but the
+ * min() lets each track shrink below 240px when the container is
+ * narrower than that (e.g. a 320px viewport whose content column is only
+ * 280px after --content-padding-x), which prevents the horizontal-scroll
+ * overflow the raw form would cause at the narrow end of the range.
+ *
+ * No screenshots or product imagery — this section is text-only per the
+ * brief.
+ *
+ * Every color, size, spacing, radius, and copy string here is bound by the
+ * brief; values live in src/styles/tokens.css and are read through the
+ * token custom properties so a single change ripples across the site. QA
+ * verifies against design/README.md §7 at 1440x900 (three columns),
+ * ~900x wide (two columns), and 390x844 (one column), and confirms there
+ * is no horizontal scroll at 320px.
+ */
+---
+
+<section class="not-section" aria-labelledby="not-section-heading">
+  <h2 id="not-section-heading" class="not-heading">What Basset is not.</h2>
+
+  <div class="columns">
+    <div class="col">
+      <span class="tag">not a log viewer</span>
+      <p class="body">It starts where viewers stop.</p>
+    </div>
+
+    <div class="col">
+      <span class="tag">not a cloud service</span>
+      <p class="body">
+        It runs where you decide, and your source and logs stay under your control.
+      </p>
+    </div>
+
+    <div class="col">
+      <span class="tag">not an AI oracle</span>
+      <p class="body">
+        Deterministic evidence first, any AI sits on top to explain, never to invent.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Section container — the brief's global separation rule: a 1px hairline
+     top border between sections, with fluid vertical padding. Left-aligned
+     block, matching every other section. No kicker on this section per
+     the brief. */
+  .not-section {
+    border-top: 1px solid var(--color-hairline);
+    padding: var(--section-padding-y) 0;
+    text-align: left;
+  }
+
+  /* Section H2 — the global h2 rule in BaseLayout already applies the type
+     tokens (family/size/weight/line-height/letter-spacing); we reset the
+     top margin to 0 so the section padding is the sole source of vertical
+     rhythm above it, and pin ink color defensively so a global tweak
+     cannot mute it. */
+  .not-heading {
+    margin: 0;
+    color: var(--color-ink);
+  }
+
+  /* Column grid — auto-fit + minmax(min(240px, 100%), 1fr) collapses
+     three columns to two and then to one as the viewport narrows, per
+     the brief. The min(240px, 100%) idiom lets each track shrink below
+     240px when the container is narrower than that (e.g. a 320px viewport
+     whose content column is only 280px after --content-padding-x), which
+     prevents horizontal overflow at the narrow end of the range. At every
+     wider width the behaviour is unchanged — minmax resolves to
+     minmax(240px, 1fr). */
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: 20px;
+    margin-top: clamp(24px, 3vw, 40px);
+  }
+
+  /* Column tag — mono 13px 600 ink on the neutral tag fill, with 5px 10px
+     padding and the 6px tag radius per the brief. display: inline-block
+     lets the tag hug its own text width instead of stretching to the
+     column. */
+  .tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: var(--weight-semibold);
+    color: var(--color-ink);
+    background: var(--color-tag-fill);
+    padding: 5px 10px;
+    border-radius: var(--radius-tag);
+  }
+
+  /* Column body — 16px/26px muted per the brief and AC #4, sitting 12px
+     below the tag. margin: 12px 0 0 resets the browser's default
+     paragraph margins so the column's own rhythm is the sole source of
+     separation. */
+  .body {
+    margin: 12px 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    color: var(--color-muted);
+  }
+</style>
