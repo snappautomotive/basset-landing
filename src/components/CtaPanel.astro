@@ -1,0 +1,154 @@
+---
+/**
+ * CtaPanel — the closing CTA panel.
+ *
+ * Recreates design/README.md §8 (CTA panel) and the approved reference in
+ * design/design-reference/Basset Landing.dc.html exactly: a tinted rounded
+ * card that pairs an H3 + muted body on the left with the site's primary
+ * "Talk to us about the evaluation" mailto button on the right. The panel
+ * itself is the visual break between §7 (What Basset is not) and the
+ * footer — the brief specifies a tinted panel and does not mention a
+ * separator hairline, so this section deliberately omits the 1px top
+ * border every other section carries. To match the reference's rhythm
+ * exactly, the section wrapper also omits the section-top padding: the
+ * previous section's bottom padding provides the space above the panel,
+ * and the wrapper's own bottom padding provides the space before the
+ * footer (equivalent to the reference's margin: 0 0 clamp(48px,6vw,72px)
+ * on the panel itself).
+ *
+ * The panel is a flex row on wide viewports: text stack on the left,
+ * button on the right. flex-wrap: wrap collapses the row to a single
+ * column below ~640px per the brief — the copy stacks above the button,
+ * and flex-shrink: 0 on the button keeps its label from being squeezed.
+ * The primary button matches the hero's button exactly (same colors,
+ * size, weight, padding, radius, hover, and focus outline) so the site's
+ * two CTAs are visually identical.
+ *
+ * Every color, size, spacing, radius, and copy string here is bound by
+ * the brief; values live in src/styles/tokens.css and are read through
+ * the token custom properties so a single change ripples across the
+ * site. QA verifies against design/README.md §8 at 1440x900 (row: copy
+ * left, button right) and 390x844 (single column: copy above button),
+ * and confirms there is no horizontal scroll at 320px.
+ *
+ * No screenshots or product imagery — this section is text-only per the
+ * brief.
+ */
+---
+
+<section class="cta-panel-section" aria-labelledby="cta-panel-heading">
+  <div class="panel">
+    <div class="copy">
+      <h3 id="cta-panel-heading" class="cta-panel-heading">
+        Bring us a bug that cost you days.
+      </h3>
+      <p class="body">
+        Basset is in development and we are taking a small number of early partners. You bring real tickets with logs, we prove it on your hardest cases, and early partners pay roughly half the standard price for the first year.
+      </p>
+    </div>
+
+    <a class="btn-primary" href="mailto:michel@snappautomotive.io">
+      Talk to us about the evaluation
+    </a>
+  </div>
+</section>
+
+<style>
+  /* Section wrapper — the tinted panel below is the visual break, so this
+     section deliberately omits the 1px hairline top border every other
+     section carries (per the brief's §8, which describes a tinted panel
+     and no separator). The wrapper also omits the section-top padding
+     so the total spacing above the panel matches the reference exactly:
+     the previous section's bottom padding provides the gap above, and
+     this wrapper's bottom padding provides the gap before the footer.
+     Left-aligned block, matching every other section. */
+  .cta-panel-section {
+    padding: 0 0 var(--section-padding-y);
+    text-align: left;
+  }
+
+  /* Panel — the tinted card. Colors, border, radius, and padding come
+     straight from the brief's §8 tokens (--color-cta-fill,
+     --color-cta-border, --radius-cta-panel). flex-wrap: wrap lets the
+     row collapse to a single column below ~640px so the copy stacks
+     above the button on narrow viewports; align-items: center vertically
+     centres the button with the copy at the wide breakpoint;
+     justify-content: space-between pushes the button to the trailing
+     edge on wide layouts. */
+  .panel {
+    background: var(--color-cta-fill);
+    border: 1px solid var(--color-cta-border);
+    border-radius: var(--radius-cta-panel);
+    padding: clamp(28px, 4vw, 56px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Copy column — the H3 + body stack. flex: 1 1 320px lets the copy
+     grow to fill the panel width when there's room and forces the row
+     to wrap (dropping the button onto its own line) once the copy's
+     minimum ideal width can't fit alongside the button. min-width: 0
+     lets the H3 wrap inside a shrinking flex item instead of forcing
+     the panel wider than its container at narrow widths. */
+  .copy {
+    flex: 1 1 320px;
+    min-width: 0;
+  }
+
+  /* H3 — the global h3 rule in BaseLayout already applies the type
+     tokens (family/size/weight/line-height/letter-spacing); we reset
+     the top margin to 0 so the panel padding is the sole source of
+     vertical rhythm above it, and pin ink color defensively so a
+     global tweak cannot mute it. */
+  .cta-panel-heading {
+    margin: 0;
+    color: var(--color-ink);
+  }
+
+  /* Body paragraph — 15.5px/25px on the CTA panel's muted ink
+     (#41564a) per the brief. margin-top matches the design-reference's
+     16px value, and max-width: 52ch caps the measure at the value the
+     brief calls out. */
+  .body {
+    margin: 16px 0 0;
+    font-family: var(--font-sans);
+    font-size: 15.5px;
+    line-height: 25px;
+    color: var(--color-cta-muted);
+    max-width: 52ch;
+  }
+
+  /* Primary button — identical to the hero's primary button per the
+     brief (§8 says "same style as hero"): solid accent, white 15px/600,
+     11px 20px padding, 8px radius. flex-shrink: 0 keeps the button's
+     label from being squeezed when the copy grows to fill the row;
+     white-space: nowrap keeps the label on a single line even at
+     narrow widths where flex-wrap has already dropped the button to
+     its own line. */
+  .btn-primary {
+    display: inline-block;
+    background: var(--color-accent);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: var(--weight-semibold);
+    line-height: 1;
+    padding: 11px 20px;
+    border-radius: var(--radius-button);
+    text-decoration: none;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .btn-primary:hover {
+    background: var(--color-accent-hover);
+  }
+
+  .btn-primary:focus-visible {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
+  }
+</style>
