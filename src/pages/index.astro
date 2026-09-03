@@ -12,7 +12,9 @@
 // §7) follows FailureModes with the same separator rule, and CtaPanel
 // (design/README.md §8) closes the content column — its tinted card acts
 // as the visual break, so unlike the sections above it does not carry a
-// hairline top border. The footer arrives in a later bead.
+// hairline top border. The Footer (design/README.md §9) sits outside
+// .content so its 1px hairline top border reaches the viewport edges,
+// mirroring the Nav's structure at the top of the page.
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Nav from "../components/Nav.astro";
 import Hero from "../components/Hero.astro";
@@ -22,6 +24,7 @@ import Research from "../components/Research.astro";
 import FailureModes from "../components/FailureModes.astro";
 import NotSection from "../components/NotSection.astro";
 import CtaPanel from "../components/CtaPanel.astro";
+import Footer from "../components/Footer.astro";
 ---
 
 <BaseLayout>
@@ -35,4 +38,5 @@ import CtaPanel from "../components/CtaPanel.astro";
     <NotSection />
     <CtaPanel />
   </main>
+  <Footer />
 </BaseLayout>
