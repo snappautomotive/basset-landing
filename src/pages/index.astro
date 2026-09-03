@@ -8,9 +8,11 @@
 // border, Mechanism (design/README.md §4) follows next with the same
 // separator rule, Research (design/README.md §5) follows Mechanism with the
 // same separator rule, FailureModes (design/README.md §6) follows
-// Research with the same separator rule, and NotSection (design/README.md
-// §7) follows FailureModes with the same separator rule. The remaining
-// sections arrive in later beads.
+// Research with the same separator rule, NotSection (design/README.md
+// §7) follows FailureModes with the same separator rule, and CtaPanel
+// (design/README.md §8) closes the content column — its tinted card acts
+// as the visual break, so unlike the sections above it does not carry a
+// hairline top border. The footer arrives in a later bead.
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Nav from "../components/Nav.astro";
 import Hero from "../components/Hero.astro";
@@ -19,6 +21,7 @@ import Mechanism from "../components/Mechanism.astro";
 import Research from "../components/Research.astro";
 import FailureModes from "../components/FailureModes.astro";
 import NotSection from "../components/NotSection.astro";
+import CtaPanel from "../components/CtaPanel.astro";
 ---
 
 <BaseLayout>
@@ -30,5 +33,6 @@ import NotSection from "../components/NotSection.astro";
     <Research />
     <FailureModes />
     <NotSection />
+    <CtaPanel />
   </main>
 </BaseLayout>
