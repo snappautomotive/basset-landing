@@ -1,0 +1,113 @@
+---
+/**
+ * Footer — the site footer.
+ *
+ * Recreates design/README.md §9 (Footer) and the approved reference in
+ * design/design-reference/Basset Landing.dc.html exactly: a full-bleed
+ * white surface with a 1px hairline top border carrying the site's single
+ * collaboration credit — "Basset, a collaboration between Snapp Automotive
+ * and [mugo-mark] mugo works". Mono 13px muted, links use the accent-text
+ * green with the accent-hover on hover. No email address per the brief
+ * (client decision).
+ *
+ * Structure mirrors the reference exactly: the mugo mark sits inside the
+ * mugo works anchor (not outside it), so the mark and its label stay a
+ * single clickable unit and — with white-space: nowrap on the link — never
+ * split across a line break. The mark is the same verbatim asset the Nav
+ * uses (public/mugo-mark.svg), served at 15x15 here per the brief's §9
+ * (the Nav uses it at 18x18 per §1); QA verifies the asset is not
+ * recoloured.
+ *
+ * The footer sits outside .content in src/pages/index.astro so its top
+ * hairline reaches the viewport edges, mirroring the Nav's structure at
+ * the top of the page. Internal padding uses --content-padding-x so the
+ * text's inner edges line up with the content column above it.
+ *
+ * Every color, size, spacing, and copy string here is bound by the brief;
+ * values live in src/styles/tokens.css and are read through the token
+ * custom properties. QA verifies against design/README.md §9 at 1440x900
+ * and 390x844.
+ */
+---
+
+<footer class="footer">
+  Basset, a collaboration between
+  <a
+    class="external-link"
+    href="https://www.snappautomotive.io"
+    target="_blank"
+    rel="noopener"
+  >Snapp Automotive</a>
+  and
+  <a
+    class="external-link mugo-link"
+    href="https://www.mugoworks.com"
+    target="_blank"
+    rel="noopener"
+  ><img
+      class="mugo-mark"
+      src="/basset-landing/mugo-mark.svg"
+      alt=""
+      width="15"
+      height="15"
+    />mugo works</a>
+</footer>
+
+<style>
+  /* Container — full-bleed white bar with the 1px hairline top border the
+     brief specifies. Internal padding uses --content-padding-x so the
+     footer's inner edges line up with the .content column above it. Mono
+     13px muted per the brief's §9 typography row. Left-aligned within the
+     same content width as the reference. */
+  .footer {
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-hairline);
+    padding: 22px var(--content-padding-x);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-footer);
+    color: var(--color-muted);
+  }
+
+  /* External-link — the two links share the same accent-text green with
+     the accent-hover on hover per the brief. text-decoration is off to
+     match the reference; the :focus-visible outline provides the visible
+     keyboard affordance the brief's a11y clause requires. border-radius
+     on the outline gives a cleaner rectangular ring around the anchor's
+     text box. */
+  .external-link {
+    color: var(--color-accent-text);
+    text-decoration: none;
+  }
+
+  .external-link:hover {
+    color: var(--color-link-hover);
+  }
+
+  .external-link:focus-visible {
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* mugo-link — the mugo works anchor contains the inline mark plus the
+     label text. white-space: nowrap keeps the mark and "mugo works" on
+     one line at every viewport width so the mark never orphans onto its
+     own line above the label. */
+  .mugo-link {
+    white-space: nowrap;
+  }
+
+  /* mugo mark — 15x15 verbatim asset (smaller than the nav's 18x18 per the
+     brief's §9). vertical-align: -3px matches the reference's baseline
+     nudge so the mark sits centred on the mono text's x-height; the 4px
+     right margin gives the small breathing gap between the mark and
+     "mugo works" the reference specifies. Width/height attributes on the
+     <img> reserve the box; this rule pins the box explicitly so a stray
+     global img rule cannot resize it. */
+  .mugo-mark {
+    width: 15px;
+    height: 15px;
+    vertical-align: -3px;
+    margin-right: 4px;
+  }
+</style>
