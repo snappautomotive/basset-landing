@@ -152,26 +152,25 @@
     outline-offset: 2px;
   }
 
-  /* Narrow-viewport CTA — below ~500px the panel is already single-column
-     (flex-wrap has dropped the button onto its own row), and the button's
-     intrinsic single-line width (~253px with white-space: nowrap) still
-     exceeds the panel's inner content-box at 320px (~222px after the
-     clamp'd 28px of side padding). Stretching the button to fill the row
-     keeps its border-box inside the panel's content-box and preserves the
-     full clamp'd right padding, but stretching alone is not enough:
-     white-space: nowrap on the base rule keeps the label a single ~253px
-     line, so at 320-334px viewport widths the label overflows the button's
-     own painted background (scrollWidth > clientWidth) even though the
-     button itself no longer overhangs the panel. Overriding to
-     white-space: normal here lets the label wrap onto a second line at the
-     narrowest widths, so scrollWidth === clientWidth on the button box at
-     every viewport width in scope. A two-line CTA label is the standard
-     mobile-CTA pattern the brief's "no horizontal overflow" clause implies
-     and the bigger centred tap target it gives is the point. Above 500px
-     the button reverts to auto width, white-space: nowrap on the base rule
-     takes back over, and the desktop row layout returns (copy left, button
-     right) untouched. */
-  @media (max-width: 500px) {
+  /* Narrow-viewport CTA — at and below ~665px the copy column's
+     flex-basis (320px) plus the button's intrinsic ~253px plus the 32px
+     gap no longer fit on one row, so flex-wrap drops the button onto its
+     own row. With justify-content: space-between and a single flex-item
+     per row, the button would otherwise anchor to the left of that row
+     leaving a large empty gap on its right, next to the copy that
+     stretched to full width above. Stretching the button to fill the row
+     removes that gap, and keeps the same visual pattern all the way down
+     to the narrowest widths — the copy is a full-width block above and
+     the CTA is a full-width block below. At the narrowest widths (roughly
+     320-334px) the button's content-box would still be narrower than the
+     ~253px single-line label, so overriding white-space: nowrap to
+     white-space: normal here lets the label wrap onto a second line
+     inside the button's own box so scrollWidth === clientWidth on the
+     button at every viewport width in scope. Above 665px the button
+     reverts to auto width, white-space: nowrap on the base rule takes
+     back over, and the row layout returns (copy left, button right)
+     untouched. */
+  @media (max-width: 665px) {
     .cta-panel-section .btn-primary {
       align-self: stretch;
       /* box-sizing: border-box so `width: 100%` collapses to the panel's
