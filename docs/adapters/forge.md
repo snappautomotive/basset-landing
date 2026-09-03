@@ -60,10 +60,26 @@ Facts core files rely on; revalidate these when porting to another host:
 - **Review comments anchor to (SHA, path, position)**: bring branches current by
   **merging** `main` in, never rebase + force-push — a force-push moves the SHA and
   every inline comment becomes "outdated" (still visible, but the anchor is stale).
-- **Attachments**: GitHub has **no public API for issue attachments**. `forge upload`
-  uploads the file as a **secret gist** (unlisted but URL-accessible) and returns its
-  raw content URL for embedding in markdown. Anyone with the URL can view it; do not
-  upload files containing credentials or private data.
+- **Attachments**: GitHub has **no public API for issue attachments**, and
+  `gh gist create` rejects binaries with "binary file not supported" — so `forge
+  upload` stores the file as an **asset on a shared release** named
+  `pr-attachments` and prints the asset's download URL for embedding in markdown.
+  The URL renders inline as an image in PR bodies and comments (unlike raw gist or
+  data-URI workarounds).
+  - Release: `pr-attachments`, title "PR attachments", `--latest=false`. Created
+    idempotently on the first `forge upload` against the repo; safe to reuse
+    across every PR.
+  - Asset name: `pr-<pr>-<sha8>-<basename>`, where `<sha8>` is the first eight
+    hex chars of the file's SHA-256. Scopes uploads by PR and prevents cross-PR
+    name collisions; identical bytes for the same PR-and-basename reuse the same
+    slot via `--clobber`.
+  - URL format: `https://github.com/{owner}/{repo}/releases/download/pr-attachments/{asset-name}`.
+  - Trade-offs: URLs persist for the life of the release (same longevity as any
+    other repo release asset), and assets are **publicly readable** — anyone with
+    the URL can view them. Do not upload files containing credentials or private
+    data. Cleanup is manual (delete individual assets from the release page, or
+    the release itself to clear all attachments). Because release assets live
+    outside git history, they do not pollute the repo.
 - **Branch protection**: the up-to-date-with-main rule is named
   `require_last_push_approval` / `require_branches_to_be_up_to_date`; required checks
   are attached by CI job name (`check`, `quality-gate` in this project).

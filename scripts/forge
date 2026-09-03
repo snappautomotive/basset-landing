@@ -18,8 +18,10 @@
 #   forge pr-create <head> <base> <title> <body>   Open a PR; prints its number.
 #   forge pr-edit <pr> <body>                   Replace the PR description (body accepts
 #                                               @file/-/literal).
-#   forge upload <pr> <file>                    Attach an image to the PR via a secret gist;
-#                                               prints its raw URL to embed in markdown.
+#   forge upload <pr> <file>                    Attach a file (including binary images) to
+#                                               the PR by uploading it as an asset on the
+#                                               shared `pr-attachments` release; prints the
+#                                               download URL to embed in markdown.
 #   forge label <pr> <label> [label ...]        Add labels to a PR.
 #   forge unlabel <pr> <label> [label ...]      Remove labels from a PR.
 #   forge prs                                   List all OPEN PRs (number, title, branch) as JSON.
@@ -172,18 +174,41 @@ case "$cmd" in
     [ $# -eq 2 ] || die "usage: forge upload <pr> <file>"
     pr="$1"; file="$2"
     [ -f "$file" ] || die "file not found: $file"
+    # GitHub has no public issue-attachments API and `gh gist create` rejects binary
+    # payloads ("binary file not supported"). We store the file as an asset on a shared
+    # `pr-attachments` release instead — release assets accept arbitrary binaries and
+    # their download URL renders inline as an image in PR bodies/comments. Names are
+    # scoped by PR + a short content hash to avoid collisions across PRs.
+    base=$(basename "$file")
+    hash=$(shasum -a 256 "$file" | awk '{print substr($1,1,8)}')
+    target_name="pr-${pr}-${hash}-${base}"
     if [ -n "$DRY_RUN" ]; then
-      printf 'gh gist create --desc "PR %s: %s" %s\n' "$pr" "$(basename "$file")" "$file"
+      printf 'gh release view pr-attachments --repo %s || gh release create pr-attachments --repo %s --title "PR attachments" --notes <notes> --latest=false\n' \
+        "$FORGE_REPO" "$FORGE_REPO"
+      printf 'gh release upload pr-attachments <tmp>/%s --clobber --repo %s   # copy of %s renamed to fix asset name\n' \
+        "$target_name" "$FORGE_REPO" "$file"
+      printf 'https://github.com/%s/releases/download/pr-attachments/%s\n' "$FORGE_REPO" "$target_name"
       exit 0
     fi
-    # GitHub has no public issue-attachments API. We upload the file as a SECRET gist
-    # (unlisted, but URL-accessible) and print its raw content URL so callers can embed
-    # it inline in markdown. Rotate/redact if the image contains sensitive info.
-    gist_url=$(gh gist create --desc "basset-landing PR #$pr: $(basename "$file")" "$file")
-    gist_id=$(printf '%s\n' "$gist_url" | awk -F/ '{print $NF}')
-    # Look up the raw URL of the just-uploaded file.
-    gh api "/gists/$gist_id" \
-      | jq -r --arg name "$(basename "$file")" '.files[$name].raw_url'
+    # Ensure the shared release exists (idempotent). --latest=false keeps it from
+    # displacing real product releases on the repo's "Releases" landing.
+    if ! gh release view pr-attachments --repo "$FORGE_REPO" >/dev/null 2>&1; then
+      gh release create pr-attachments --repo "$FORGE_REPO" \
+        --title "PR attachments" \
+        --notes "Storage for PR review attachments (screenshots etc). Managed by scripts/forge; do not delete." \
+        --latest=false >/dev/null
+    fi
+    # The asset name on a GitHub release is always the basename of the uploaded file
+    # (the `#label` suffix on `gh release upload` sets a display label, NOT the asset
+    # name). To scope the asset name by PR and content hash we upload a copy under the
+    # target name in a temp directory, then clean up. --clobber replaces any existing
+    # asset of the same name (safe: identical bytes for the same PR-and-basename
+    # produce the same hashed name and reuse the same slot).
+    tmpdir=$(mktemp -d)
+    trap 'rm -rf "$tmpdir"' EXIT
+    cp -- "$file" "$tmpdir/$target_name"
+    gh release upload pr-attachments "$tmpdir/$target_name" --clobber --repo "$FORGE_REPO" >/dev/null
+    printf 'https://github.com/%s/releases/download/pr-attachments/%s\n' "$FORGE_REPO" "$target_name"
     ;;
   label)
     [ $# -ge 2 ] || die "usage: forge label <pr> <label> [label ...]"
